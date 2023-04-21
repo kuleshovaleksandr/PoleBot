@@ -1,6 +1,8 @@
 package com.example.greeteverydaybot.service;
 
 import com.example.greeteverydaybot.config.BotConfig;
+import com.example.greeteverydaybot.entity.User;
+import com.example.greeteverydaybot.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +10,13 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -24,6 +28,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Autowired
     private BotConfig botConfig;
+
+    @Autowired
+    private UserRepository userRepository;
+
     private List<BotCommand> listOfCommands;
     private final static String HELP_TEXT = "This bot is created to help channel Pole.\n" +
             "You can execute commands from the main menu on the left\n" +
@@ -55,6 +63,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             switch(messageText) {
                 case "/start":
+                    registerUser(update.getMessage());
                     startCommandReceived(chatId, firstName);
                     break;
                 case "/help":
@@ -65,6 +74,22 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
 
             findWordTesla(chatId, messageText);
+        }
+    }
+
+    private void registerUser(Message message) {
+        if(userRepository.findById(message.getChatId()).isEmpty()) {
+            var id = message.getChatId();
+            var chat = message.getChat();
+
+            User user = new User();
+            user.setId(id);
+            user.setUserName(chat.getUserName());
+            user.setFirstName(chat.getFirstName());
+            user.setLastName(chat.getLastName());
+            user.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
+            userRepository.save(user);
+            log.info("User created: " + user);
         }
     }
 
