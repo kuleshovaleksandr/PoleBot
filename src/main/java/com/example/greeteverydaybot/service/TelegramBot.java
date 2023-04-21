@@ -3,17 +3,24 @@ package com.example.greeteverydaybot.service;
 import com.example.greeteverydaybot.config.BotConfig;
 import com.example.greeteverydaybot.entity.User;
 import com.example.greeteverydaybot.repository.UserRepository;
+import com.vdurmont.emoji.EmojiParser;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
@@ -69,11 +76,67 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "/help":
                     sendMessage(chatId, HELP_TEXT);
                     break;
+                case "/register":
+                    register(chatId);
+                    break;
                 default: if(messageText.startsWith("/"))
                     sendMessage(chatId, "Sorry, command was not recognized.");
             }
 
             findWordTesla(chatId, messageText);
+        } else if(update.hasCallbackQuery()) {
+            String callbackData = update.getCallbackQuery().getData();
+            int messageId = update.getCallbackQuery().getMessage().getMessageId();
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
+            String text = "";
+
+            if(callbackData.equals("YES_BUTTON")) {
+                text = "You pressed Yes button";
+
+            } else if(callbackData.equals("NO_BUTTON")) {
+                text = "You pressed No button";
+            }
+
+            EditMessageText message = new EditMessageText();
+            message.setChatId(chatId);
+            message.setText(text);
+            message.setMessageId(messageId);
+
+            try {
+                execute(message);
+            } catch (TelegramApiException e) {
+                log.error("Error occurred: " + e.getMessage());
+            }
+        }
+    }
+
+    private void register(long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText("Do you really want to register?");
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+
+        var yesButton = new InlineKeyboardButton();
+        yesButton.setText("Yes");
+        yesButton.setCallbackData("YES_BUTTON");
+        rowInline.add(yesButton);
+
+        var noButton = new InlineKeyboardButton();
+        noButton.setText("No");
+        noButton.setCallbackData("NO_BUTTON");
+        rowInline.add(noButton);
+
+        rowsInline.add(rowInline);
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
         }
     }
 
@@ -103,7 +166,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void startCommandReceived(long chatId, String firstName) {
-        String answer = "Hello, " + firstName + ", nice to meet you!";
+        String answer = EmojiParser.parseToUnicode("Hello, " + firstName + ", nice to meet you!" + " :blush:" + "\uD83D\uDE07");
+//        String answer = "Hello, " + firstName + ", nice to meet you!";
         log.info("Replied to user " + firstName);
         sendMessage(chatId, answer);
     }
@@ -112,6 +176,25 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(textToSend);
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setResizeKeyboard(true);
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        KeyboardRow row = new KeyboardRow();
+        row.add("weather");
+        row.add("get a joke");
+
+        keyboardRows.add(row);
+
+        row = new KeyboardRow();
+        row.add("register");
+        row.add("check my data");
+        row.add("delete my data");
+
+        keyboardRows.add(row);
+
+        keyboardMarkup.setKeyboard(keyboardRows);
+        sendMessage.setReplyMarkup(keyboardMarkup);
 
         try {
             execute(sendMessage);
