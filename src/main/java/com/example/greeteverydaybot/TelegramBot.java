@@ -1,18 +1,22 @@
-package com.example.greeteverydaybot.service;
+package com.example.greeteverydaybot;
 
 import com.example.greeteverydaybot.config.BotConfig;
 import com.example.greeteverydaybot.entity.User;
+import com.example.greeteverydaybot.model.Currency;
+import com.example.greeteverydaybot.repository.AdsRepository;
 import com.example.greeteverydaybot.repository.UserRepository;
+import com.example.greeteverydaybot.service.CurrencyConversionService;
 import com.vdurmont.emoji.EmojiParser;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
-import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -24,8 +28,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +41,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AdsRepository adsRepository;
+    @Autowired
+    private CurrencyConversionService currencyConversionService;
+
+    HashMap<String, Currency> currencyChoice = new HashMap<>();
 
     private List<BotCommand> listOfCommands;
     private final static String HELP_TEXT = "This bot is created to help channel Pole.\n" +
@@ -53,6 +62,10 @@ public class TelegramBot extends TelegramLongPollingBot {
         listOfCommands.add(new BotCommand("/deletedata", "delete my data"));
         listOfCommands.add(new BotCommand("/help", "how to use this bot"));
         listOfCommands.add(new BotCommand("/settings", "set your preferences"));
+        listOfCommands.add(new BotCommand("/currency", "change currency"));
+
+        currencyChoice.put("ORIGINAL", null);
+        currencyChoice.put("TARGET", null);
 
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
@@ -68,10 +81,34 @@ public class TelegramBot extends TelegramLongPollingBot {
             String firstName = update.getMessage().getChat().getFirstName();
             long chatId = update.getMessage().getChatId();
 
+            if(messageText.contains("/send") && botConfig.getOwnerId().equals(chatId)) {
+                var textToSend = EmojiParser.parseToUnicode(messageText.substring(messageText.indexOf(" ")));
+                var users = userRepository.findAll();
+                for(User user: users) {
+                    sendMessage(user.getId(), textToSend);
+                }
+            }
+
+            if(currencyChoice.get("ORIGINAL") != null && currencyChoice.get("TARGET") != null) {
+                double value = Double.parseDouble(messageText);
+                Currency originalCurrency = currencyChoice.get("ORIGINAL");
+                Currency targetCurrency = currencyChoice.get("TARGET");
+                double conversionRatio = currencyConversionService.getConversionRatio(originalCurrency, targetCurrency);
+
+                SendMessage message = SendMessage.builder()
+                                            .chatId(chatId)
+                                            .text(String.format(
+                                                    "%4.2f %s is %4.2f %s",
+                                                    value, originalCurrency, (value * conversionRatio), targetCurrency))
+                                            .build();
+                executeMessage(message);
+            }
+
             switch(messageText) {
                 case "/start":
                     registerUser(update.getMessage());
                     startCommandReceived(chatId, firstName);
+                    addKeyBoardMarkup();
                     break;
                 case "/help":
                     sendMessage(chatId, HELP_TEXT);
@@ -79,33 +116,96 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "/register":
                     register(chatId);
                     break;
+                case "/currency":
+                    showCurrencyMenu(chatId);
+                    break;
                 default: if(messageText.startsWith("/"))
                     sendMessage(chatId, "Sorry, command was not recognized.");
             }
-
             findWordTesla(chatId, messageText);
         } else if(update.hasCallbackQuery()) {
-            String callbackData = update.getCallbackQuery().getData();
-            int messageId = update.getCallbackQuery().getMessage().getMessageId();
-            long chatId = update.getCallbackQuery().getMessage().getChatId();
-            String text = "";
+            handleCallBack(update.getCallbackQuery());
+        }
+    }
 
-            if(callbackData.equals("YES_BUTTON")) {
-                text = "You pressed Yes button";
+    private void handleCallBack(CallbackQuery callbackQuery) {
+        String callbackData = callbackQuery.getData();
+        int messageId = callbackQuery.getMessage().getMessageId();
+        long chatId = callbackQuery.getMessage().getChatId();
+        String text = "";
 
-            } else if(callbackData.equals("NO_BUTTON")) {
-                text = "You pressed No button";
+        if(callbackData.contains(":")) {
+            String[] param = callbackData.split(":");
+            String action = param[0];
+            Currency currency = Currency.valueOf(param[1]);
+            if(action.equals("ORIGINAL") || action.equals("TARGET")) {
+                currencyChoice.put(action, currency);
             }
+        }
 
-            EditMessageText message = new EditMessageText();
-            message.setChatId(chatId);
-            message.setText(text);
-            message.setMessageId(messageId);
+        if(callbackData.equals("YES_BUTTON")) {
+            text = "You pressed Yes button";
+        } else if(callbackData.equals("NO_BUTTON")) {
+            text = "You pressed No button";
+        }
+        editText(chatId, messageId, text);
+    }
 
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                log.error("Error occurred: " + e.getMessage());
+    private void showCurrencyMenu(long chatId) {
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+
+        for(Currency currency: Currency.values()) {
+            buttons.add(
+                    Arrays.asList(
+                        InlineKeyboardButton.builder()
+                                .text(currency.toString())
+                                .callbackData("ORIGINAL:" + currency)
+                                .build(),
+                        InlineKeyboardButton.builder()
+                                .text(currency.toString())
+                                .callbackData("TARGET:" + currency)
+                                .build()
+                    )
+            );
+        }
+        SendMessage message = SendMessage.builder()
+                                    .chatId(chatId)
+                                    .text("Choose original and target currency\n" +
+                                            "-----------------------------------------------------\n" +
+                                            "       ORIGINAL                           TARGET")
+                                    .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
+                                    .build();
+        executeMessage(message);
+    }
+
+    private void editText(long chatId, int messageId, String text) {
+        EditMessageText message = new EditMessageText();
+        message.setChatId(chatId);
+        message.setText(text);
+        message.setMessageId(messageId);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
+        }
+    }
+
+    private void executeMessage(SendMessage message) {
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
+        }
+    }
+
+    @Scheduled(cron="${cron.scheduler}")
+    private void sendAds() {
+        var ads = adsRepository.findAll();
+        var users = userRepository.findAll();
+        for(var ad: ads) {
+            for(User user: users) {
+                sendMessage(user.getId(), ad.getText());
             }
         }
     }
@@ -133,11 +233,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         inlineKeyboardMarkup.setKeyboard(rowsInline);
         message.setReplyMarkup(inlineKeyboardMarkup);
 
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            log.error("Error occurred: " + e.getMessage());
-        }
+        executeMessage(message);
     }
 
     private void registerUser(Message message) {
@@ -167,41 +263,36 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void startCommandReceived(long chatId, String firstName) {
         String answer = EmojiParser.parseToUnicode("Hello, " + firstName + ", nice to meet you!" + " :blush:" + "\uD83D\uDE07");
-//        String answer = "Hello, " + firstName + ", nice to meet you!";
         log.info("Replied to user " + firstName);
         sendMessage(chatId, answer);
     }
 
     private void sendMessage(long chatId, String textToSend) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(textToSend);
+        SendMessage message = SendMessage.builder()
+                .chatId(chatId)
+                .text(textToSend)
+                .build();
+        executeMessage(message);
+    }
 
+    private void addKeyBoardMarkup() {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         KeyboardRow row = new KeyboardRow();
         row.add("weather");
         row.add("get a joke");
-
         keyboardRows.add(row);
 
         row = new KeyboardRow();
         row.add("register");
         row.add("check my data");
         row.add("delete my data");
-
         keyboardRows.add(row);
 
         keyboardMarkup.setKeyboard(keyboardRows);
-        sendMessage.setReplyMarkup(keyboardMarkup);
-
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            log.error("Error occurred: " + e.getMessage());
-        }
-
+//        message.setReplyMarkup(keyboardMarkup);
+//        executeMessage(message);
     }
 
     @Override
