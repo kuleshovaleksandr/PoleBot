@@ -5,18 +5,22 @@ import com.example.greeteverydaybot.entity.User;
 import com.example.greeteverydaybot.model.Currency;
 import com.example.greeteverydaybot.repository.AdsRepository;
 import com.example.greeteverydaybot.repository.UserRepository;
+import com.example.greeteverydaybot.service.AnimationService;
 import com.example.greeteverydaybot.service.CurrencyConversionService;
 import com.vdurmont.emoji.EmojiParser;
 import jakarta.annotation.PostConstruct;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -28,7 +32,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +52,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     private AdsRepository adsRepository;
     @Autowired
     private CurrencyConversionService currencyConversionService;
+    @Autowired
+    private AnimationService animationService;
 
     HashMap<String, Currency> currencyChoice = new HashMap<>();
 
@@ -119,12 +128,29 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "/currency":
                     showCurrencyMenu(chatId);
                     break;
+                case "/gif":
+                    sendGif(chatId, "cat");
+                    break;
                 default: if(messageText.startsWith("/"))
                     sendMessage(chatId, "Sorry, command was not recognized.");
             }
             findWordTesla(chatId, messageText);
         } else if(update.hasCallbackQuery()) {
             handleCallBack(update.getCallbackQuery());
+        }
+    }
+
+    @SneakyThrows
+    private void sendGif(long chatId, String tag) {
+        String gifUrl = animationService.getRandomGif(tag);
+        SendAnimation animation = SendAnimation.builder()
+                .chatId(chatId)
+                .animation(new InputFile(gifUrl))
+                .build();
+        try {
+            execute(animation);
+        } catch(TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 
