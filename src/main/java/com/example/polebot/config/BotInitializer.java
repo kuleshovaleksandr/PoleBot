@@ -1,6 +1,6 @@
-package com.example.greeteverydaybot.config;
+package com.example.polebot.config;
 
-import com.example.greeteverydaybot.TelegramBot;
+import com.example.polebot.TelegramBot;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;

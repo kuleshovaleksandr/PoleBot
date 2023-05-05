@@ -1,13 +1,13 @@
-package com.example.greeteverydaybot;
+package com.example.polebot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GreetEveryDayBotApplication {
+public class PoleBotApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GreetEveryDayBotApplication.class, args);
+        SpringApplication.run(PoleBotApplication.class, args);
     }
 
 }

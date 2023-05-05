@@ -1,7 +1,7 @@
-package com.example.greeteverydaybot.service.impl;
+package com.example.polebot.service.impl;
 
-import com.example.greeteverydaybot.model.Currency;
-import com.example.greeteverydaybot.service.CurrencyConversionService;
+import com.example.polebot.model.Currency;
+import com.example.polebot.service.CurrencyConversionService;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 

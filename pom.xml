@@ -10,13 +10,13 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>GreetEveryDayBot</artifactId>
+    <artifactId>PoleBot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>GreetEveryDayBot</name>
-    <description>GreetEveryDayBot</description>
+    <name>PoleBot</name>
+    <description>PoleBot</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>20</java.version>
     </properties>
 
     <dependencies>

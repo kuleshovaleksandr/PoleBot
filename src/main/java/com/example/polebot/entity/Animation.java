@@ -1,6 +1,6 @@
-package com.example.greeteverydaybot.entity;
+package com.example.polebot.entity;
 
-import com.example.greeteverydaybot.model.WeekDay;
+import com.example.polebot.model.WeekDay;
 import jakarta.persistence.*;
 import lombok.Data;
 

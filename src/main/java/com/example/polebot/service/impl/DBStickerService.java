@@ -1,8 +1,8 @@
-package com.example.greeteverydaybot.service.impl;
+package com.example.polebot.service.impl;
 
-import com.example.greeteverydaybot.entity.Sticker;
-import com.example.greeteverydaybot.repository.StickerRepository;
-import com.example.greeteverydaybot.service.StickerService;
+import com.example.polebot.entity.Sticker;
+import com.example.polebot.repository.StickerRepository;
+import com.example.polebot.service.StickerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

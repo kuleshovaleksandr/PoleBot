@@ -1,4 +1,4 @@
-package com.example.greeteverydaybot.entity;
+package com.example.polebot.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

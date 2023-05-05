@@ -1,7 +1,7 @@
-package com.example.greeteverydaybot.service;
+package com.example.polebot.service;
 
-import com.example.greeteverydaybot.model.Currency;
-import com.example.greeteverydaybot.service.impl.NbrbCurrencyConversionService;
+import com.example.polebot.model.Currency;
+import com.example.polebot.service.impl.NbrbCurrencyConversionService;
 
 public interface CurrencyConversionService {
 

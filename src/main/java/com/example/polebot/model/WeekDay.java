@@ -1,4 +1,4 @@
-package com.example.greeteverydaybot.model;
+package com.example.polebot.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.greeteverydaybot.service;
+package com.example.polebot.service;
 
 import java.util.List;
 

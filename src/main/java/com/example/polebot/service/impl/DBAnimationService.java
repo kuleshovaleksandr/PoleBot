@@ -1,9 +1,8 @@
-package com.example.greeteverydaybot.service.impl;
+package com.example.polebot.service.impl;
 
-import com.example.greeteverydaybot.entity.Animation;
-import com.example.greeteverydaybot.model.WeekDay;
-import com.example.greeteverydaybot.repository.AnimationRepository;
-import com.example.greeteverydaybot.service.AnimationService;
+import com.example.polebot.entity.Animation;
+import com.example.polebot.repository.AnimationRepository;
+import com.example.polebot.service.AnimationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.example.greeteverydaybot.config;
+package com.example.polebot.config;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

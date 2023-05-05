@@ -1,6 +1,6 @@
-package com.example.greeteverydaybot.repository;
+package com.example.polebot.repository;
 
-import com.example.greeteverydaybot.entity.User;
+import com.example.polebot.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

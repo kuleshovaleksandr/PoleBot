@@ -1,6 +1,6 @@
-package com.example.greeteverydaybot.service;
+package com.example.polebot.service;
 
-import com.example.greeteverydaybot.entity.Sticker;
+import com.example.polebot.entity.Sticker;
 
 public interface StickerService {
     Sticker getStickerByEmoji(String emoji);

@@ -1,6 +1,6 @@
-package com.example.greeteverydaybot.service.impl;
+package com.example.polebot.service.impl;
 
-import com.example.greeteverydaybot.service.AnimationService;
+import com.example.polebot.service.AnimationService;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;

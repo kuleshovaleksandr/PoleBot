@@ -1,15 +1,14 @@
-package com.example.greeteverydaybot;
+package com.example.polebot;
 
-import com.example.greeteverydaybot.config.BotConfig;
-import com.example.greeteverydaybot.entity.User;
-import com.example.greeteverydaybot.model.Currency;
-import com.example.greeteverydaybot.repository.AdsRepository;
-import com.example.greeteverydaybot.repository.UserRepository;
-import com.example.greeteverydaybot.service.CurrencyConversionService;
-import com.example.greeteverydaybot.service.StickerService;
-import com.example.greeteverydaybot.service.impl.DBAnimationService;
-import com.example.greeteverydaybot.service.impl.DBStickerService;
-import com.example.greeteverydaybot.service.impl.GiphyAnimationService;
+import com.example.polebot.config.BotConfig;
+import com.example.polebot.entity.User;
+import com.example.polebot.model.Currency;
+import com.example.polebot.repository.AdsRepository;
+import com.example.polebot.repository.UserRepository;
+import com.example.polebot.service.CurrencyConversionService;
+import com.example.polebot.service.StickerService;
+import com.example.polebot.service.impl.DBAnimationService;
+import com.example.polebot.service.impl.GiphyAnimationService;
 import com.vdurmont.emoji.EmojiParser;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
