@@ -61,7 +61,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Autowired
     private GiphyAnimationService giphyAnimationService;
     @Autowired
-    private DBAnimationService DBAnimationService;
+    private DBAnimationService dbAnimationService;
     @Autowired
     private StickerService stickerService;
 
@@ -144,6 +144,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "/sticker":
                     sendSticker(chatId);
                     break;
+                case "/animation":
+                    sendAnimation(chatId);
+                    break;
                 default: if(messageText.startsWith("/"))
                     sendMessage(chatId, "Sorry, command was not recognized.");
             }
@@ -155,6 +158,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         } else if(update.getMessage().hasSticker()) {
             handleSticker(update.getMessage().getSticker());
         }
+    }
+
+    @SneakyThrows
+    private void sendAnimation(long chatId) {
+
     }
 
     @SneakyThrows
@@ -181,7 +189,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void handleAnimation(Animation animation) {
+        String id = animation.getFileUniqueId();
+        String fileId = animation.getFileId();
+        String name = animation.getFileName();
 
+        dbAnimationService.saveAnimation(id, fileId, name);
     }
 
     private void handleSticker(Sticker sticker) {

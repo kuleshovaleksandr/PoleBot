@@ -52,7 +52,7 @@ public class GiphyAnimationService implements AnimationService {
     }
 
     @Override
-    public void saveSticker() {
+    public void saveAnimation(String id, String fileId, String name) {
 
     }
 }

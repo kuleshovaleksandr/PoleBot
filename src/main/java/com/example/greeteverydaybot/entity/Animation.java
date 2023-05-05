@@ -1,9 +1,7 @@
 package com.example.greeteverydaybot.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.greeteverydaybot.model.WeekDay;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -14,6 +12,13 @@ public class Animation {
     @Id
     private String id;
 
+    @Column(name="file_id")
+    private String fileId;
+
     @Column(name="name")
     private String name;
+
+    @Column(name="day")
+    @Enumerated(EnumType.STRING)
+    private WeekDay weekDay;
 }

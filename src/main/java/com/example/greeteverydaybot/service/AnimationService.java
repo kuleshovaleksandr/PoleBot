@@ -8,5 +8,5 @@ public interface AnimationService {
 
     String searchGif();
 
-    void saveSticker();
+    void saveAnimation(String id, String fileId, String name);
 }
