@@ -7,4 +7,6 @@ public interface AnimationService {
     String getRandomGif(String tag);
 
     String searchGif();
+
+    void saveSticker();
 }

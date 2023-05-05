@@ -1,6 +1,7 @@
-package com.example.greeteverydaybot.service;
+package com.example.greeteverydaybot.service.impl;
 
 import com.example.greeteverydaybot.model.Currency;
+import com.example.greeteverydaybot.service.CurrencyConversionService;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 

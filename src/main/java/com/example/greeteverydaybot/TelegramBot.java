@@ -5,8 +5,11 @@ import com.example.greeteverydaybot.entity.User;
 import com.example.greeteverydaybot.model.Currency;
 import com.example.greeteverydaybot.repository.AdsRepository;
 import com.example.greeteverydaybot.repository.UserRepository;
-import com.example.greeteverydaybot.service.AnimationService;
 import com.example.greeteverydaybot.service.CurrencyConversionService;
+import com.example.greeteverydaybot.service.StickerService;
+import com.example.greeteverydaybot.service.impl.DBAnimationService;
+import com.example.greeteverydaybot.service.impl.DBStickerService;
+import com.example.greeteverydaybot.service.impl.GiphyAnimationService;
 import com.vdurmont.emoji.EmojiParser;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
@@ -18,6 +21,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -25,10 +29,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.games.Animation;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
@@ -53,7 +59,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Autowired
     private CurrencyConversionService currencyConversionService;
     @Autowired
-    private AnimationService animationService;
+    private GiphyAnimationService giphyAnimationService;
+    @Autowired
+    private DBAnimationService DBAnimationService;
+    @Autowired
+    private StickerService stickerService;
 
     HashMap<String, Currency> currencyChoice = new HashMap<>();
 
@@ -131,18 +141,34 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "/gif":
                     sendGif(chatId, "cat");
                     break;
+                case "/sticker":
+                    sendSticker(chatId);
+                    break;
                 default: if(messageText.startsWith("/"))
                     sendMessage(chatId, "Sorry, command was not recognized.");
             }
             findWordTesla(chatId, messageText);
         } else if(update.hasCallbackQuery()) {
             handleCallBack(update.getCallbackQuery());
+        } else if(update.getMessage().hasAnimation()) {
+            handleAnimation(update.getMessage().getAnimation());
+        } else if(update.getMessage().hasSticker()) {
+            handleSticker(update.getMessage().getSticker());
         }
     }
 
     @SneakyThrows
+    private void sendSticker(long chatId) {
+        SendSticker send = new SendSticker();
+        send.setChatId(chatId);
+        send.setSticker(new InputFile(
+                stickerService.getStickerByEmoji("\uD83E\uDE9F").getFileId()));
+        execute(send);
+    }
+
+    @SneakyThrows
     private void sendGif(long chatId, String tag) {
-        String gifUrl = animationService.getRandomGif(tag);
+        String gifUrl = giphyAnimationService.getRandomGif(tag);
         SendAnimation animation = SendAnimation.builder()
                 .chatId(chatId)
                 .animation(new InputFile(gifUrl))
@@ -152,6 +178,18 @@ public class TelegramBot extends TelegramLongPollingBot {
         } catch(TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    private void handleAnimation(Animation animation) {
+
+    }
+
+    private void handleSticker(Sticker sticker) {
+        String id = sticker.getFileUniqueId();
+        String fileId = sticker.getFileId();
+        String name = sticker.getSetName();
+        String emoji = sticker.getEmoji();
+        stickerService.saveSticker(id, fileId, name, emoji);
     }
 
     private void handleCallBack(CallbackQuery callbackQuery) {

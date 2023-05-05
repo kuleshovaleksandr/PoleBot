@@ -1,5 +1,6 @@
-package com.example.greeteverydaybot.service;
+package com.example.greeteverydaybot.service.impl;
 
+import com.example.greeteverydaybot.service.AnimationService;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -48,5 +49,10 @@ public class GiphyAnimationService implements AnimationService {
             e.printStackTrace();
         }
         return response.toString();
+    }
+
+    @Override
+    public void saveSticker() {
+
     }
 }
