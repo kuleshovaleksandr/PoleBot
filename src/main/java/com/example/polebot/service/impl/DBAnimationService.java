@@ -1,10 +1,15 @@
 package com.example.polebot.service.impl;
 
 import com.example.polebot.entity.Animation;
+import com.example.polebot.entity.Sticker;
+import com.example.polebot.model.WeekDay;
 import com.example.polebot.repository.AnimationRepository;
 import com.example.polebot.service.AnimationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Random;
 
 @Service
 public class DBAnimationService implements AnimationService {
@@ -13,12 +18,13 @@ public class DBAnimationService implements AnimationService {
     private AnimationRepository animationRepository;
 
     @Override
-    public String getRandomGif(String tag) {
-        return null;
+    public String getRandomAnimation(String weekDay) {
+        List<Animation> animations = animationRepository.findAnimationsByWeekDay(WeekDay.valueOf(weekDay));
+        return animations.get(new Random().nextInt(animations.size())).getFileId();
     }
 
     @Override
-    public String searchGif() {
+    public String getAnimation() {
         return null;
     }
 

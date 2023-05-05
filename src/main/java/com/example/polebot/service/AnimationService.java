@@ -1,12 +1,10 @@
 package com.example.polebot.service;
 
-import java.util.List;
-
 public interface AnimationService {
 
-    String getRandomGif(String tag);
+    String getRandomAnimation(String tag);
 
-    String searchGif();
+    String getAnimation();
 
     void saveAnimation(String id, String fileId, String name);
 }

@@ -19,7 +19,7 @@ public class GiphyAnimationService implements AnimationService {
     private final String GIPHY_URL = "https://api.giphy.com/v1/gifs/";
 
     @Override
-    public String getRandomGif(String tag) {
+    public String getRandomAnimation(String tag) {
         String response = getResponse("random?api_key=" + API_KEY + "&tag=" + tag + "&rating=g");
         JSONObject json = new JSONObject(response);
         String gifId = json.getJSONObject("data").getString("id");
@@ -27,7 +27,7 @@ public class GiphyAnimationService implements AnimationService {
     }
 
     @Override
-    public String searchGif() {
+    public String getAnimation() {
         String response = getResponse("");
         JSONObject json = new JSONObject(response);
         return null;

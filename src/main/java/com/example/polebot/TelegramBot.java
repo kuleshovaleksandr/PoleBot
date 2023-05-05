@@ -3,6 +3,7 @@ package com.example.polebot;
 import com.example.polebot.config.BotConfig;
 import com.example.polebot.entity.User;
 import com.example.polebot.model.Currency;
+import com.example.polebot.model.WeekDay;
 import com.example.polebot.repository.AdsRepository;
 import com.example.polebot.repository.UserRepository;
 import com.example.polebot.service.CurrencyConversionService;
@@ -161,7 +162,23 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @SneakyThrows
     private void sendAnimation(long chatId) {
+        String animationId = dbAnimationService.getRandomAnimation(WeekDay.FRIDAY.toString());
+        SendAnimation sendAnimation = new SendAnimation();
+        sendAnimation.setChatId(chatId);
+        sendAnimation.setAnimation(new InputFile(animationId));
+        execute(sendAnimation);
+    }
 
+    @SneakyThrows
+    @Scheduled(cron="0 0 8 * * *")
+    private void sendWeekDayAnimation() {
+        String animationId = dbAnimationService.getRandomAnimation("");
+        User user = userRepository.findAll().get(0);
+
+        SendAnimation sendAnimation = new SendAnimation();
+        sendAnimation.setChatId(user.getId());
+        sendAnimation.setAnimation(new InputFile(animationId));
+        execute(sendAnimation);
     }
 
     @SneakyThrows
@@ -175,7 +192,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @SneakyThrows
     private void sendGif(long chatId, String tag) {
-        String gifUrl = giphyAnimationService.getRandomGif(tag);
+        String gifUrl = giphyAnimationService.getRandomAnimation(tag);
         SendAnimation animation = SendAnimation.builder()
                 .chatId(chatId)
                 .animation(new InputFile(gifUrl))
@@ -191,7 +208,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         String id = animation.getFileUniqueId();
         String fileId = animation.getFileId();
         String name = animation.getFileName();
-
         dbAnimationService.saveAnimation(id, fileId, name);
     }
 

@@ -18,7 +18,7 @@ public class Animation {
     @Column(name="name")
     private String name;
 
-    @Column(name="day")
+    @Column(name="week_day")
     @Enumerated(EnumType.STRING)
     private WeekDay weekDay;
 }
