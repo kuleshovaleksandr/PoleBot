@@ -68,9 +68,6 @@ public class PoleBot extends TelegramLongPollingBot {
         listOfCommands.add(new BotCommand("/mydata", "get your data stored"));
         listOfCommands.add(new BotCommand("/currency", "change currency"));
 
-        currencyChoice.put("ORIGINAL", null);
-        currencyChoice.put("TARGET", null);
-
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
@@ -85,6 +82,9 @@ public class PoleBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             String firstName = update.getMessage().getChat().getFirstName();
             chatId = update.getMessage().getChatId();
+
+            updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.TEXT)
+                    .handleUpdate(update);
 
             if(currencyChoice.get("ORIGINAL") != null && currencyChoice.get("TARGET") != null) {
                 double value = 0;
@@ -131,7 +131,6 @@ public class PoleBot extends TelegramLongPollingBot {
                 default: if(messageText.startsWith("/"))
                     sendMessage(chatId, "Sorry, command was not recognized.");
             }
-            findWordTesla(chatId, messageText);
         } else if(update.hasCallbackQuery()) {
 //            updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.CALLBACK)
 //                    .handleUpdate(update);
