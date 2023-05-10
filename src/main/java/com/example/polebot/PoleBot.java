@@ -2,7 +2,6 @@ package com.example.polebot;
 
 import com.example.polebot.config.BotConfig;
 import com.example.polebot.entity.User;
-import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.handler.UpdateHandlerFactory;
 import com.example.polebot.handler.UpdateHandlerStage;
 import com.example.polebot.model.Currency;
@@ -12,7 +11,6 @@ import com.example.polebot.service.CurrencyConversionService;
 import com.example.polebot.service.StickerService;
 import com.example.polebot.service.impl.DBAnimationService;
 import com.example.polebot.service.impl.GiphyAnimationService;
-import com.vdurmont.emoji.EmojiParser;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -25,18 +23,13 @@ import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
-import org.telegram.telegrambots.meta.api.objects.games.Animation;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
@@ -122,7 +115,6 @@ public class PoleBot extends TelegramLongPollingBot {
             switch(messageText) {
                 case "/start":
                     registerUser(update.getMessage());
-                    startCommandReceived(chatId, firstName);
                     addKeyBoardMarkup();
                     break;
                 case "/currency":
@@ -141,8 +133,8 @@ public class PoleBot extends TelegramLongPollingBot {
             }
             findWordTesla(chatId, messageText);
         } else if(update.hasCallbackQuery()) {
-            updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.CALLBACK)
-                    .handleUpdate(update);
+//            updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.CALLBACK)
+//                    .handleUpdate(update);
             handleCallBack(update.getCallbackQuery());
         } else if(update.getMessage().hasAnimation()) {
             updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.ANIMATION)
@@ -194,9 +186,6 @@ public class PoleBot extends TelegramLongPollingBot {
 
     private void handleCallBack(CallbackQuery callbackQuery) {
         String callbackData = callbackQuery.getData();
-        int messageId = callbackQuery.getMessage().getMessageId();
-        long chatId = callbackQuery.getMessage().getChatId();
-        String text = "";
 
         if(callbackData.contains(":")) {
             String[] param = callbackData.split(":");
@@ -206,13 +195,6 @@ public class PoleBot extends TelegramLongPollingBot {
                 currencyChoice.put(action, currency);
             }
         }
-
-        if(callbackData.equals("YES_BUTTON")) {
-            text = "You pressed Yes button";
-        } else if(callbackData.equals("NO_BUTTON")) {
-            text = "You pressed No button";
-        }
-        editText(chatId, messageId, text);
     }
 
     @SneakyThrows
@@ -243,17 +225,14 @@ public class PoleBot extends TelegramLongPollingBot {
         execute(message);
     }
 
+    @SneakyThrows
     private void editText(long chatId, int messageId, String text) {
-        EditMessageText message = new EditMessageText();
-        message.setChatId(chatId);
-        message.setText(text);
-        message.setMessageId(messageId);
-
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            log.error("Error occurred: " + e.getMessage());
-        }
+        EditMessageText message = EditMessageText.builder()
+                .chatId(chatId)
+                .text(text)
+                .messageId(messageId)
+                .build();
+        execute(message);
     }
 
     @SneakyThrows
@@ -285,8 +264,8 @@ public class PoleBot extends TelegramLongPollingBot {
 
     private void registerUser(Message message) {
         if(userRepository.findById(message.getChatId()).isEmpty()) {
-            var id = message.getChatId();
-            var chat = message.getChat();
+            long id = message.getChatId();
+            Chat chat = message.getChat();
 
             User user = new User();
             user.setId(id);
@@ -308,12 +287,6 @@ public class PoleBot extends TelegramLongPollingBot {
         }
     }
 
-    private void startCommandReceived(long chatId, String firstName) {
-        String answer = EmojiParser.parseToUnicode("Hello, " + firstName + ", nice to meet you!" + " :blush:" + "\uD83D\uDE07");
-        log.info("Replied to user " + firstName);
-        sendMessage(chatId, answer);
-    }
-
     @SneakyThrows
     private void sendMessage(long chatId, String textToSend) {
         SendMessage message = SendMessage.builder()
@@ -323,6 +296,7 @@ public class PoleBot extends TelegramLongPollingBot {
         execute(message);
     }
 
+    @SneakyThrows
     private void addKeyBoardMarkup() {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
@@ -340,7 +314,7 @@ public class PoleBot extends TelegramLongPollingBot {
 
         keyboardMarkup.setKeyboard(keyboardRows);
 //        message.setReplyMarkup(keyboardMarkup);
-//        executeMessage(message);
+//        execute(message);
     }
 
     @Override
