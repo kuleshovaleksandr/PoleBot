@@ -1,0 +1,4 @@
+INSERT INTO public.stickers (id, emoji, file_id, name) VALUES ('AgADNh0AAngeYUk', '🪟', 'CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ', 'PoleShumit');
+INSERT INTO public.stickers (id, emoji, file_id, name) VALUES ('AgADCyEAArKYaEk', '💨', 'CAACAgIAAxkBAAIBI2RU1_GRmvCVGCBPIaQkUi0G8dGwAAILIQACsphoSeoqeW-o36G9LwQ', 'PoleShumit');
+INSERT INTO public.stickers (id, emoji, file_id, name) VALUES ('AgADoyAAAoyF0Es', '💤', 'CAACAgIAAxkBAAIBJGRU2EtiXPokJCgBbQH6Cig2wQZsAAKjIAACjIXQS_x-v7oX_y9CLwQ', 'PoleShumit');
+INSERT INTO public.stickers (id, emoji, file_id, name) VALUES ('AgADrRUAAhSfiEg', '🛏', 'CAACAgIAAxkBAAIBJWRU2LSqJ6zsbVITd6jBfheTShsxAAKtFQACFJ-ISJ2W6eP1eZfDLwQ', 'PoleShumit');
