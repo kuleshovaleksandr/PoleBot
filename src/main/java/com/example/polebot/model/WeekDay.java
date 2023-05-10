@@ -6,13 +6,13 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum WeekDay {
-    MONDAY("monday"),
-    TUESDAY("tuesday"),
-    WEDNESDAY("wednesday"),
-    THURSDAY("thursday"),
-    FRIDAY("friday"),
-    SATURDAY("saturday"),
-    SUNDAY("sunday");
+    SUNDAY(1),
+    MONDAY(2),
+    TUESDAY(3),
+    WEDNESDAY(4),
+    THURSDAY(5),
+    FRIDAY(6),
+    SATURDAY(7);
 
-    private final String day;
+    private final int day;
 }

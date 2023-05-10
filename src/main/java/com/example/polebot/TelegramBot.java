@@ -2,9 +2,9 @@ package com.example.polebot;
 
 import com.example.polebot.config.BotConfig;
 import com.example.polebot.entity.User;
+import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.model.Currency;
 import com.example.polebot.model.WeekDay;
-import com.example.polebot.repository.AdsRepository;
 import com.example.polebot.repository.UserRepository;
 import com.example.polebot.service.CurrencyConversionService;
 import com.example.polebot.service.StickerService;
@@ -38,10 +38,8 @@ import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,9 +51,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     private BotConfig botConfig;
 
     @Autowired
-    private UserRepository userRepository;
+    private UpdateHandler updateHandler;
     @Autowired
-    private AdsRepository adsRepository;
+    private UserRepository userRepository;
     @Autowired
     private CurrencyConversionService currencyConversionService;
     @Autowired
@@ -65,22 +63,15 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Autowired
     private StickerService stickerService;
 
-    HashMap<String, Currency> currencyChoice = new HashMap<>();
-
+    private long chatId;
+    private HashMap<String, Currency> currencyChoice = new HashMap<>();
     private List<BotCommand> listOfCommands;
-    private final static String HELP_TEXT = "This bot is created to help channel Pole.\n" +
-            "You can execute commands from the main menu on the left\n" +
-            "Type /start to see welcome message\n" +
-            "Type /mydata to see your data";
 
     @PostConstruct
     public void initCommands() {
         listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "give a welcome message"));
         listOfCommands.add(new BotCommand("/mydata", "get your data stored"));
-        listOfCommands.add(new BotCommand("/deletedata", "delete my data"));
-        listOfCommands.add(new BotCommand("/help", "how to use this bot"));
-        listOfCommands.add(new BotCommand("/settings", "set your preferences"));
         listOfCommands.add(new BotCommand("/currency", "change currency"));
 
         currencyChoice.put("ORIGINAL", null);
@@ -98,29 +89,32 @@ public class TelegramBot extends TelegramLongPollingBot {
         if(update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             String firstName = update.getMessage().getChat().getFirstName();
-            long chatId = update.getMessage().getChatId();
-
-            if(messageText.contains("/send") && botConfig.getOwnerId().equals(chatId)) {
-                var textToSend = EmojiParser.parseToUnicode(messageText.substring(messageText.indexOf(" ")));
-                var users = userRepository.findAll();
-                for(User user: users) {
-                    sendMessage(user.getId(), textToSend);
-                }
-            }
+            chatId = update.getMessage().getChatId();
 
             if(currencyChoice.get("ORIGINAL") != null && currencyChoice.get("TARGET") != null) {
-                double value = Double.parseDouble(messageText);
-                Currency originalCurrency = currencyChoice.get("ORIGINAL");
-                Currency targetCurrency = currencyChoice.get("TARGET");
-                double conversionRatio = currencyConversionService.getConversionRatio(originalCurrency, targetCurrency);
+                double value = 0;
+                try {
+                    value = Double.parseDouble(messageText);
+                    Currency originalCurrency = currencyChoice.get("ORIGINAL");
+                    Currency targetCurrency = currencyChoice.get("TARGET");
+                    double conversionRatio = currencyConversionService.getConversionRatio(originalCurrency, targetCurrency);
 
-                SendMessage message = SendMessage.builder()
-                                            .chatId(chatId)
-                                            .text(String.format(
-                                                    "%4.2f %s is %4.2f %s",
-                                                    value, originalCurrency, (value * conversionRatio), targetCurrency))
-                                            .build();
-                executeMessage(message);
+                    SendMessage message = SendMessage.builder()
+                            .chatId(chatId)
+                            .text(String.format(
+                                    "%4.2f %s is %4.2f %s",
+                                    value, originalCurrency, (value * conversionRatio), targetCurrency))
+                            .build();
+                    currencyChoice.put("ORIGINAL", null);
+                    currencyChoice.put("TARGET", null);
+                    executeMessage(message);
+                } catch(NumberFormatException e) {
+                    SendMessage message = SendMessage.builder()
+                            .chatId(chatId)
+                            .text("Please enter a number")
+                            .build();
+                    executeMessage(message);
+                }
             }
 
             switch(messageText) {
@@ -129,12 +123,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                     startCommandReceived(chatId, firstName);
                     addKeyBoardMarkup();
                     break;
-                case "/help":
-                    sendMessage(chatId, HELP_TEXT);
-                    break;
-                case "/register":
-                    register(chatId);
-                    break;
                 case "/currency":
                     showCurrencyMenu(chatId);
                     break;
@@ -142,10 +130,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                     sendGif(chatId, "cat");
                     break;
                 case "/sticker":
-                    sendSticker(chatId);
+                    sendSticker();
                     break;
                 case "/animation":
-                    sendAnimation(chatId);
+                    sendAnimation();
                     break;
                 default: if(messageText.startsWith("/"))
                     sendMessage(chatId, "Sorry, command was not recognized.");
@@ -154,35 +142,35 @@ public class TelegramBot extends TelegramLongPollingBot {
         } else if(update.hasCallbackQuery()) {
             handleCallBack(update.getCallbackQuery());
         } else if(update.getMessage().hasAnimation()) {
-            handleAnimation(update.getMessage().getAnimation());
+            updateHandler.handleAnimation(update.getMessage().getAnimation());
         } else if(update.getMessage().hasSticker()) {
-            handleSticker(update.getMessage().getSticker());
+            updateHandler.handleSticker(update.getMessage().getSticker());
         }
     }
 
     @SneakyThrows
-    private void sendAnimation(long chatId) {
-        String animationId = dbAnimationService.getRandomAnimation(WeekDay.FRIDAY.toString());
-        SendAnimation sendAnimation = new SendAnimation();
-        sendAnimation.setChatId(chatId);
-        sendAnimation.setAnimation(new InputFile(animationId));
-        execute(sendAnimation);
+    private void sendAnimation() {
+
     }
 
     @SneakyThrows
     @Scheduled(cron="0 0 8 * * *")
     private void sendWeekDayAnimation() {
-        String animationId = dbAnimationService.getRandomAnimation("");
-        User user = userRepository.findAll().get(0);
-
-        SendAnimation sendAnimation = new SendAnimation();
-        sendAnimation.setChatId(user.getId());
-        sendAnimation.setAnimation(new InputFile(animationId));
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
+        WeekDay[] daysOfWeek = WeekDay.values();
+        String animationId = dbAnimationService.getRandomWeekDayAnimation(daysOfWeek[currentDay-1]);
+        SendAnimation sendAnimation = SendAnimation.builder()
+                .chatId(chatId)
+                .animation(new InputFile(animationId))
+                .build();
         execute(sendAnimation);
     }
 
     @SneakyThrows
-    private void sendSticker(long chatId) {
+    private void sendSticker() {
         SendSticker send = new SendSticker();
         send.setChatId(chatId);
         send.setSticker(new InputFile(
@@ -202,21 +190,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         } catch(TelegramApiException e) {
             e.printStackTrace();
         }
-    }
-
-    private void handleAnimation(Animation animation) {
-        String id = animation.getFileUniqueId();
-        String fileId = animation.getFileId();
-        String name = animation.getFileName();
-        dbAnimationService.saveAnimation(id, fileId, name);
-    }
-
-    private void handleSticker(Sticker sticker) {
-        String id = sticker.getFileUniqueId();
-        String fileId = sticker.getFileId();
-        String name = sticker.getSetName();
-        String emoji = sticker.getEmoji();
-        stickerService.saveSticker(id, fileId, name, emoji);
     }
 
     private void handleCallBack(CallbackQuery callbackQuery) {
@@ -287,17 +260,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             execute(message);
         } catch (TelegramApiException e) {
             log.error("Error occurred: " + e.getMessage());
-        }
-    }
-
-    @Scheduled(cron="${cron.scheduler}")
-    private void sendAds() {
-        var ads = adsRepository.findAll();
-        var users = userRepository.findAll();
-        for(var ad: ads) {
-            for(User user: users) {
-                sendMessage(user.getId(), ad.getText());
-            }
         }
     }
 

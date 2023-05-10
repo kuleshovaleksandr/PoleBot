@@ -17,10 +17,14 @@ public class DBAnimationService implements AnimationService {
     @Autowired
     private AnimationRepository animationRepository;
 
+    public String getRandomWeekDayAnimation(WeekDay weekDay) {
+        List<Animation> animations = animationRepository.findAnimationsByWeekDay(weekDay);
+        return animations.get(new Random().nextInt(animations.size())).getFileId();
+    }
+
     @Override
     public String getRandomAnimation(String weekDay) {
-        List<Animation> animations = animationRepository.findAnimationsByWeekDay(WeekDay.valueOf(weekDay));
-        return animations.get(new Random().nextInt(animations.size())).getFileId();
+        return null;
     }
 
     @Override
