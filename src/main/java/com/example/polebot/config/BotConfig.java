@@ -12,12 +12,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Data
 public class BotConfig {
 
-    @Value("${bot.name}")
+    @Value("${bot.pole.name}")
     String botName;
 
-    @Value("${bot.token}")
+    @Value("${bot.pole.token}")
     String token;
 
-    @Value("${bot.owner}")
+    @Value("${bot.pole.owner}")
     Long ownerId;
 }

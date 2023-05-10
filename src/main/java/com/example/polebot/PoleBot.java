@@ -3,6 +3,8 @@ package com.example.polebot;
 import com.example.polebot.config.BotConfig;
 import com.example.polebot.entity.User;
 import com.example.polebot.handler.UpdateHandler;
+import com.example.polebot.handler.UpdateHandlerFactory;
+import com.example.polebot.handler.UpdateHandlerStage;
 import com.example.polebot.model.Currency;
 import com.example.polebot.model.WeekDay;
 import com.example.polebot.repository.UserRepository;
@@ -38,20 +40,19 @@ import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
 @Component
-public class TelegramBot extends TelegramLongPollingBot {
+public class PoleBot extends TelegramLongPollingBot {
 
     @Autowired
     private BotConfig botConfig;
 
     @Autowired
-    private UpdateHandler updateHandler;
+    private UpdateHandlerFactory updateHandlerFactory;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -84,6 +85,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
         if(update.hasMessage() && update.getMessage().hasText()) {
@@ -107,13 +109,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                             .build();
                     currencyChoice.put("ORIGINAL", null);
                     currencyChoice.put("TARGET", null);
-                    executeMessage(message);
+                    execute(message);
                 } catch(NumberFormatException e) {
                     SendMessage message = SendMessage.builder()
                             .chatId(chatId)
                             .text("Please enter a number")
                             .build();
-                    executeMessage(message);
+                    execute(message);
                 }
             }
 
@@ -133,24 +135,22 @@ public class TelegramBot extends TelegramLongPollingBot {
                     sendSticker();
                     break;
                 case "/animation":
-                    sendAnimation();
                     break;
                 default: if(messageText.startsWith("/"))
                     sendMessage(chatId, "Sorry, command was not recognized.");
             }
             findWordTesla(chatId, messageText);
         } else if(update.hasCallbackQuery()) {
+            updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.CALLBACK)
+                    .handleUpdate(update);
             handleCallBack(update.getCallbackQuery());
         } else if(update.getMessage().hasAnimation()) {
-            updateHandler.handleAnimation(update.getMessage().getAnimation());
+            updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.ANIMATION)
+                    .handleUpdate(update);
         } else if(update.getMessage().hasSticker()) {
-            updateHandler.handleSticker(update.getMessage().getSticker());
+            updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.STICKER)
+                    .handleUpdate(update);
         }
-    }
-
-    @SneakyThrows
-    private void sendAnimation() {
-
     }
 
     @SneakyThrows
@@ -215,6 +215,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         editText(chatId, messageId, text);
     }
 
+    @SneakyThrows
     private void showCurrencyMenu(long chatId) {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
@@ -239,7 +240,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                                             "       ORIGINAL                           TARGET")
                                     .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
                                     .build();
-        executeMessage(message);
+        execute(message);
     }
 
     private void editText(long chatId, int messageId, String text) {
@@ -255,14 +256,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void executeMessage(SendMessage message) {
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            log.error("Error occurred: " + e.getMessage());
-        }
-    }
-
+    @SneakyThrows
     private void register(long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
@@ -286,7 +280,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         inlineKeyboardMarkup.setKeyboard(rowsInline);
         message.setReplyMarkup(inlineKeyboardMarkup);
 
-        executeMessage(message);
+        execute(message);
     }
 
     private void registerUser(Message message) {
@@ -320,12 +314,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         sendMessage(chatId, answer);
     }
 
+    @SneakyThrows
     private void sendMessage(long chatId, String textToSend) {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
                 .text(textToSend)
                 .build();
-        executeMessage(message);
+        execute(message);
     }
 
     private void addKeyBoardMarkup() {
