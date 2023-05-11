@@ -15,12 +15,11 @@ public class TextUpdateHandler implements UpdateHandler {
     @Override
     public void handleUpdate(Update update) {
         String message = update.getMessage().getText();
+        long chatId = update.getMessage().getChatId();
         if(message.startsWith("/")) {
-            commandParser.parse(message);
+            commandParser.parse(chatId, message);
         } else {
-            textParser.findWordTesla(message);
-            textParser.findWordKorea(message);
-            textParser.getCurrencyValue(message);
+            textParser.parse(chatId, message);
         }
     }
 }

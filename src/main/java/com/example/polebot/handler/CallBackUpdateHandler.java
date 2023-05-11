@@ -1,8 +1,12 @@
 package com.example.polebot.handler;
 
 import com.example.polebot.model.Currency;
+import com.example.polebot.parser.CommandParser;
 import com.example.polebot.parser.TextParser;
+import com.example.polebot.sender.Sender;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -10,10 +14,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.HashMap;
 
+@Getter
+@Setter
 @Component
 public class CallBackUpdateHandler implements UpdateHandler {
-
-    @Autowired private TextParser textParser;
 
     private HashMap<String, Currency> currencyChoice = new HashMap<>();
 
@@ -27,7 +31,6 @@ public class CallBackUpdateHandler implements UpdateHandler {
     public void handleUpdate(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         String callbackData = callbackQuery.getData();
-
         if(callbackData.contains(":")) {
             saveCurrencyChoice(callbackData);
         }
