@@ -1,7 +1,6 @@
 package com.example.polebot.config;
 
 import com.example.polebot.PoleBot;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -10,12 +9,10 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-@Slf4j
 @Component
 public class BotInitializer {
 
-    @Autowired
-    PoleBot bot;
+    @Autowired private PoleBot bot;
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() {
@@ -23,7 +20,7 @@ public class BotInitializer {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(bot);
         } catch(TelegramApiException e) {
-            log.error("Error occurred: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

@@ -4,10 +4,8 @@ import com.example.polebot.handler.CallBackUpdateHandler;
 import com.example.polebot.model.Currency;
 import com.example.polebot.sender.Sender;
 import com.example.polebot.service.CurrencyConversionService;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -23,7 +21,7 @@ public class TextParser implements Parser {
     @Override
     public void parse(long chatId, String message) {
         sender.setChatId(chatId);
-        getCurrencyValue(chatId, message);
+        getCurrencyValue(message);
     }
 
     private void findWordTesla(String message) {
@@ -38,7 +36,7 @@ public class TextParser implements Parser {
 
     }
 
-    private void getCurrencyValue(long chatId, String message) {
+    private void getCurrencyValue(String message) {
         HashMap<String, Currency> currencyChoice = callBackUpdateHandler.getCurrencyChoice();
         if(currencyChoice.get("ORIGINAL") != null && currencyChoice.get("TARGET") != null) {
             double value;
@@ -49,9 +47,9 @@ public class TextParser implements Parser {
                 double conversionRatio = currencyConversionService.getConversionRatio(originalCurrency, targetCurrency);
                 callBackUpdateHandler.init();
                 String text = String.format("%4.2f %s is %4.2f %s", value, originalCurrency, (value * conversionRatio), targetCurrency);
-                sender.sendMessage(chatId, text);
+                sender.sendMessage(text);
             } catch (NumberFormatException e) {
-                sender.sendMessage(chatId,"Please enter a number");
+                sender.sendMessage("Please enter a number");
             }
         }
     }

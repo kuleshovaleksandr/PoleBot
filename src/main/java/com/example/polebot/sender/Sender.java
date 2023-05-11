@@ -4,6 +4,7 @@ import com.example.polebot.PoleBot;
 import com.example.polebot.model.WeekDay;
 import com.example.polebot.service.StickerService;
 import com.example.polebot.service.impl.DBAnimationService;
+import com.example.polebot.service.impl.GiphyAnimationService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -28,11 +29,12 @@ public class Sender {
     @Autowired private PoleBot bot;
     @Autowired private StickerService stickerService;
     @Autowired private DBAnimationService dbAnimationService;
+    @Autowired private GiphyAnimationService giphyAnimationService;
 
     private long chatId;
 
     @SneakyThrows
-    public void sendMessage(long chatId, String text) {
+    public void sendMessage(String text) {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
                 .text(text)
@@ -41,7 +43,7 @@ public class Sender {
     }
 
     @SneakyThrows
-    public void sendInlineMessage(long chatId, String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
+    public void sendInlineMessage(String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
                 .text(text)
@@ -51,7 +53,7 @@ public class Sender {
     }
 
     @SneakyThrows
-    public void sendAnimation(long chatId, InputFile inputFile) {
+    public void sendAnimation(InputFile inputFile) {
         SendAnimation sendAnimation = SendAnimation.builder()
                 .chatId(chatId)
                 .animation(inputFile)
@@ -60,7 +62,7 @@ public class Sender {
     }
 
     @SneakyThrows
-    public void sendSticker(long chatId, InputFile inputFile) {
+    public void sendSticker(InputFile inputFile) {
         SendSticker sendSticker = SendSticker.builder()
                 .chatId(chatId)
                 .sticker(new InputFile(stickerService.getStickerByEmoji("\uD83E\uDE9F").getFileId()))
@@ -69,13 +71,19 @@ public class Sender {
     }
 
     @SneakyThrows
-    public void editText(long chatId, int messageId, String text) {
+    public void editText(int messageId, String text) {
         EditMessageText message = EditMessageText.builder()
                 .chatId(chatId)
                 .text(text)
                 .messageId(messageId)
                 .build();
         bot.execute(message);
+    }
+
+    @SneakyThrows
+    private void sendGif(String tag) {
+        String gifUrl = giphyAnimationService.getRandomAnimation(tag);
+        sendAnimation(new InputFile(gifUrl));
     }
 
     @SneakyThrows
@@ -87,6 +95,6 @@ public class Sender {
         int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
         WeekDay[] daysOfWeek = WeekDay.values();
         String animationId = dbAnimationService.getRandomWeekDayAnimation(daysOfWeek[currentDay-1]);
-        sendAnimation(chatId, new InputFile(animationId));
+        sendAnimation(new InputFile(animationId));
     }
 }

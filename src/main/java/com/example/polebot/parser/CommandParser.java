@@ -26,7 +26,7 @@ public class CommandParser implements Parser {
 //                addKeyBoardMarkup();
                 break;
             case "/currency":
-                showCurrencyMenu(chatId);
+                showCurrencyMenu();
                 break;
             case "/gif":
 //                sendGif(chatId, "cat");
@@ -40,7 +40,7 @@ public class CommandParser implements Parser {
     }
 
     @SneakyThrows
-    private void showCurrencyMenu(long chatId) {
+    private void showCurrencyMenu() {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
         for(Currency currency: Currency.values()) {
@@ -60,6 +60,6 @@ public class CommandParser implements Parser {
         String text = "Choose original and target currency\n" +
                 "-----------------------------------------------------\n" +
                 "       ORIGINAL                           TARGET";
-        sender.sendInlineMessage(chatId, text, InlineKeyboardMarkup.builder().keyboard(buttons).build());
+        sender.sendInlineMessage(text, InlineKeyboardMarkup.builder().keyboard(buttons).build());
     }
 }
