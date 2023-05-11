@@ -19,6 +19,7 @@ public class CommandParser implements Parser {
 
     @Override
     public void parse(long chatId, String message) {
+        sender.setChatId(chatId);
         switch(message) {
             case "/start":
 //                registerUser(update.getMessage());

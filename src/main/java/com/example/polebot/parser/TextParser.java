@@ -22,6 +22,7 @@ public class TextParser implements Parser {
 
     @Override
     public void parse(long chatId, String message) {
+        sender.setChatId(chatId);
         getCurrencyValue(chatId, message);
     }
 

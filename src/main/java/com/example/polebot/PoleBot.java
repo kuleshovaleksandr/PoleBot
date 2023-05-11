@@ -48,13 +48,9 @@ public class PoleBot extends TelegramLongPollingBot {
 
     @Autowired private UpdateHandlerFactory updateHandlerFactory;
     @Autowired private UserRepository userRepository;
-    @Autowired private CurrencyConversionService currencyConversionService;
     @Autowired private GiphyAnimationService giphyAnimationService;
-    @Autowired private DBAnimationService dbAnimationService;
     @Autowired private StickerService stickerService;
 
-    private long chatId;
-//    private HashMap<String, Currency> currencyChoice = new HashMap<>();
     private List<BotCommand> listOfCommands;
 
     @PostConstruct
@@ -75,32 +71,8 @@ public class PoleBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if(update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
-            String firstName = update.getMessage().getChat().getFirstName();
-            chatId = update.getMessage().getChatId();
-
             updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.TEXT)
                     .handleUpdate(update);
-
-//            switch(messageText) {
-//                case "/start":
-//                    registerUser(update.getMessage());
-//                    addKeyBoardMarkup();
-//                    break;
-//                case "/currency":
-//                    showCurrencyMenu(chatId);
-//                    break;
-//                case "/gif":
-//                    sendGif(chatId, "cat");
-//                    break;
-//                case "/sticker":
-//                    sendSticker();
-//                    break;
-//                case "/animation":
-//                    break;
-//                default: if(messageText.startsWith("/"))
-//                    sendMessage(chatId, "Sorry, command was not recognized.");
-//            }
         } else if(update.hasCallbackQuery()) {
             updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.CALLBACK)
                     .handleUpdate(update);
@@ -111,31 +83,6 @@ public class PoleBot extends TelegramLongPollingBot {
             updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.STICKER)
                     .handleUpdate(update);
         }
-    }
-
-    @SneakyThrows
-    @Scheduled(cron="0 0 8 * * *")
-    private void sendWeekDayAnimation() {
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
-        WeekDay[] daysOfWeek = WeekDay.values();
-        String animationId = dbAnimationService.getRandomWeekDayAnimation(daysOfWeek[currentDay-1]);
-        SendAnimation sendAnimation = SendAnimation.builder()
-                .chatId(chatId)
-                .animation(new InputFile(animationId))
-                .build();
-        execute(sendAnimation);
-    }
-
-    @SneakyThrows
-    private void sendSticker() {
-        SendSticker send = new SendSticker();
-        send.setChatId(chatId);
-        send.setSticker(new InputFile(
-                stickerService.getStickerByEmoji("\uD83E\uDE9F").getFileId()));
-        execute(send);
     }
 
     @SneakyThrows
@@ -150,44 +97,6 @@ public class PoleBot extends TelegramLongPollingBot {
         } catch(TelegramApiException e) {
             e.printStackTrace();
         }
-    }
-
-    @SneakyThrows
-    private void showCurrencyMenu(long chatId) {
-        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-
-        for(Currency currency: Currency.values()) {
-            buttons.add(
-                    Arrays.asList(
-                        InlineKeyboardButton.builder()
-                                .text(currency.toString())
-                                .callbackData("ORIGINAL:" + currency)
-                                .build(),
-                        InlineKeyboardButton.builder()
-                                .text(currency.toString())
-                                .callbackData("TARGET:" + currency)
-                                .build()
-                    )
-            );
-        }
-        SendMessage message = SendMessage.builder()
-                                    .chatId(chatId)
-                                    .text("Choose original and target currency\n" +
-                                            "-----------------------------------------------------\n" +
-                                            "       ORIGINAL                           TARGET")
-                                    .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
-                                    .build();
-        execute(message);
-    }
-
-    @SneakyThrows
-    private void editText(long chatId, int messageId, String text) {
-        EditMessageText message = EditMessageText.builder()
-                .chatId(chatId)
-                .text(text)
-                .messageId(messageId)
-                .build();
-        execute(message);
     }
 
     @SneakyThrows
