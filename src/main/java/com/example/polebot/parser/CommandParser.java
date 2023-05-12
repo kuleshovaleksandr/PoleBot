@@ -1,12 +1,19 @@
 package com.example.polebot.parser;
 
+import com.example.polebot.PoleBot;
+import com.example.polebot.model.Command;
 import com.example.polebot.model.Currency;
 import com.example.polebot.sender.Sender;
+import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,25 +23,29 @@ import java.util.List;
 public class CommandParser implements Parser {
 
     @Autowired private Sender sender;
+    @Autowired private PoleBot bot;
+
+    @PostConstruct
+    public void initCommands() {
+        try {
+            bot.execute(new SetMyCommands(Command.getBotCommands(), new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void parse(long chatId, String message) {
         sender.setChatId(chatId);
         switch(message) {
-            case "/start":
-//                registerUser(update.getMessage());
-//                addKeyBoardMarkup();
+            case "/joke":
+                sender.sendMessage("joke");
+                break;
+            case "/forecast":
+                sender.sendMessage("forecast");
                 break;
             case "/currency":
                 showCurrencyMenu();
-                break;
-            case "/gif":
-//                sendGif(chatId, "cat");
-                break;
-            case "/sticker":
-//                sendSticker();
-                break;
-            case "/animation":
                 break;
         }
     }

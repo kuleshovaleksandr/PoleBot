@@ -22,18 +22,24 @@ public class TextParser implements Parser {
     public void parse(long chatId, String message) {
         sender.setChatId(chatId);
         getCurrencyValue(message);
+        findWordTesla(message);
+        findWordKorea(message);
     }
 
     private void findWordTesla(String message) {
         Pattern pattern = Pattern.compile("[Тт]есл.");
         Matcher matcher = pattern.matcher(message);
         while(matcher.find()) {
-//            sendMessage(chatId, "you are boring");
+            sender.sendMessage("you are boring");
         }
     }
 
     private void findWordKorea(String message) {
-
+        Pattern pattern = Pattern.compile("[Кк]оре.");
+        Matcher matcher = pattern.matcher(message);
+        while(matcher.find()) {
+            sender.sendMessage("you typed \"Корея\"");
+        }
     }
 
     private void getCurrencyValue(String message) {

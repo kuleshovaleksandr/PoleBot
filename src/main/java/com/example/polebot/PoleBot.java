@@ -5,20 +5,20 @@ import com.example.polebot.entity.User;
 import com.example.polebot.handler.UpdateHandlerFactory;
 import com.example.polebot.handler.UpdateHandlerStage;
 import com.example.polebot.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
-import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -32,18 +32,12 @@ public class PoleBot extends TelegramLongPollingBot {
     @Autowired private UpdateHandlerFactory updateHandlerFactory;
     @Autowired private UserRepository userRepository;
 
-    private List<BotCommand> listOfCommands;
-
-    @PostConstruct
-    public void initCommands() {
-        listOfCommands = new ArrayList<>();
-        listOfCommands.add(new BotCommand("/start", "give a welcome message"));
-        listOfCommands.add(new BotCommand("/mydata", "get your data stored"));
-        listOfCommands.add(new BotCommand("/currency", "change currency"));
-
+    @EventListener({ContextRefreshedEvent.class})
+    public void init() {
         try {
-            this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
-        } catch (TelegramApiException e) {
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            telegramBotsApi.registerBot(this);
+        } catch(TelegramApiException e) {
             e.printStackTrace();
         }
     }
