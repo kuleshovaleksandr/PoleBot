@@ -9,7 +9,6 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
-import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -37,16 +36,12 @@ public class CommandParser implements Parser {
     @Override
     public void parse(long chatId, String message) {
         sender.setChatId(chatId);
-        switch(message) {
-            case "/joke":
-                sender.sendMessage("joke");
-                break;
-            case "/forecast":
-                sender.sendMessage("forecast");
-                break;
-            case "/currency":
-                showCurrencyMenu();
-                break;
+        if(message.equals(Command.JOKE.getName())) {
+            sender.sendMessage("joke");
+        } else if(message.equals(Command.FORECAST.getName())) {
+            sender.sendMessage("forecast");
+        } else if(message.equals(Command.CURRENCY.getName())) {
+            showCurrencyMenu();
         }
     }
 

@@ -60,41 +60,7 @@ public class PoleBot extends TelegramLongPollingBot {
         }
     }
 
-    private void registerUser(Message message) {
-        if(userRepository.findById(message.getChatId()).isEmpty()) {
-            long id = message.getChatId();
-            Chat chat = message.getChat();
 
-            User user = new User();
-            user.setId(id);
-            user.setUserName(chat.getUserName());
-            user.setFirstName(chat.getFirstName());
-            user.setLastName(chat.getLastName());
-            user.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
-            userRepository.save(user);
-        }
-    }
-
-    @SneakyThrows
-    private void addKeyBoardMarkup() {
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true);
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add("weather");
-        row.add("get a joke");
-        keyboardRows.add(row);
-
-        row = new KeyboardRow();
-        row.add("register");
-        row.add("check my data");
-        row.add("delete my data");
-        keyboardRows.add(row);
-
-        keyboardMarkup.setKeyboard(keyboardRows);
-//        message.setReplyMarkup(keyboardMarkup);
-//        execute(message);
-    }
 
     @Override
     public String getBotToken() {
