@@ -3,7 +3,7 @@ package com.example.polebot.parser;
 import com.example.polebot.PoleBot;
 import com.example.polebot.model.Command;
 import com.example.polebot.model.Currency;
-import com.example.polebot.sender.Sender;
+import com.example.polebot.sender.MessageSender;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class CommandParser implements Parser {
 
-    @Autowired private Sender sender;
+    @Autowired private MessageSender sender;
     @Autowired private PoleBot bot;
 
     @PostConstruct

@@ -2,7 +2,7 @@ package com.example.polebot.parser;
 
 import com.example.polebot.handler.CallBackUpdateHandler;
 import com.example.polebot.model.Currency;
-import com.example.polebot.sender.Sender;
+import com.example.polebot.sender.MessageSender;
 import com.example.polebot.service.CurrencyConversionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @Component
 public class TextParser implements Parser {
 
-    @Autowired private Sender sender;
+    @Autowired private MessageSender sender;
     @Autowired private CallBackUpdateHandler callBackUpdateHandler;
     @Autowired private CurrencyConversionService currencyConversionService;
 
