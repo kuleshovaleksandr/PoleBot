@@ -30,7 +30,7 @@ public class TextParser implements Parser {
         Pattern pattern = Pattern.compile("[Тт]есл.");
         Matcher matcher = pattern.matcher(message);
         while(matcher.find()) {
-            sender.sendMessage("you are boring");
+            sender.sendMessage("you typed \"Тесла\"");
         }
     }
 

@@ -1,6 +1,10 @@
 package com.example.polebot.converter;
 
+import com.example.polebot.PoleBot;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.GetFile;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.EncoderException;
 import ws.schild.jave.MultimediaObject;
@@ -12,6 +16,10 @@ import java.io.File;
 @Component
 public class OggConverter {
 
+    @Autowired private PoleBot bot;
+    private final String VOICE_OGG_PATH = "./data/voices/savedVoice.ogg";
+    private final String VOICE_MP3_PATH = "./data/voices/savedVoice.mp3";
+
     public void toMp3() {
         try{
             AudioAttributes audio = new AudioAttributes();
@@ -20,22 +28,26 @@ public class OggConverter {
             audio.setChannels(2);
             audio.setSamplingRate(44100);
 
-            //Encoding attributes
             EncodingAttributes attrs = new EncodingAttributes();
             attrs.setOutputFormat("mp3");
             attrs.setAudioAttributes(audio);
 
-            //Encode
             Encoder encoder = new Encoder();
-            File sourceFile = new File("./data/voices/savedVoice.ogg");
-            File targetFile = new File("./data/voices/savedVoice.mp3");
+            File sourceFile = new File(VOICE_OGG_PATH);
+            File targetFile = new File(VOICE_MP3_PATH);
             encoder.encode(new MultimediaObject(sourceFile), targetFile, attrs);
         } catch (IllegalArgumentException | EncoderException ex){
 
         }
     }
 
-    public void create(String url, String fileName) {
-
+    @SneakyThrows
+    public void create(String fileId) {
+        GetFile getFile = GetFile.builder()
+                .fileId(fileId)
+                .build();
+        String filePath = bot.execute(getFile).getFilePath();
+        java.io.File outputFile = new File(VOICE_OGG_PATH);
+        bot.downloadFile(filePath, outputFile);
     }
 }
