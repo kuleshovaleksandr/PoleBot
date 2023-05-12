@@ -4,5 +4,6 @@ public enum UpdateHandlerStage {
     CALLBACK,
     STICKER,
     ANIMATION,
-    TEXT
+    TEXT,
+    VOICE
 }

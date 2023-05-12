@@ -1,5 +1,6 @@
-package com.example.polebot.handler;
+package com.example.polebot.handler.impl;
 
+import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.service.StickerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

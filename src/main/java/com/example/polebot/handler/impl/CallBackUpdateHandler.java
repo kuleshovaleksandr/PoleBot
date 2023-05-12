@@ -1,5 +1,6 @@
-package com.example.polebot.handler;
+package com.example.polebot.handler.impl;
 
+import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.model.Currency;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;

@@ -1,5 +1,6 @@
 package com.example.polebot.handler;
 
+import com.example.polebot.handler.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,9 @@ public class UpdateHandlerFactory {
                 break;
             case TEXT:
                 updateHandler = (TextUpdateHandler) context.getBean("textUpdateHandler");
+                break;
+            case VOICE:
+                updateHandler = (VoiceUpdateHandler) context.getBean("voiceUpdateHandler");
                 break;
         }
         return updateHandler;

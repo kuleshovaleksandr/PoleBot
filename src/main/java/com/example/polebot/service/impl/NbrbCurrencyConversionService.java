@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -21,7 +22,7 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
     }
 
     private double getRate(Currency currency) {
-        if(currency == Currency.BYN) {
+        if (currency == Currency.BYN) {
             return 1;
         }
 
@@ -32,7 +33,7 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String inputLine;
             StringBuilder response = new StringBuilder();
-            while((inputLine = in.readLine()) != null) {
+            while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
             in.close();
@@ -40,6 +41,8 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
             double scale = json.getDouble("Cur_Scale");
             double rate = json.getDouble("Cur_OfficialRate");
             return rate / scale;
+        } catch(ConnectException e) {
+            //TODO load hardcoded currency rates
         } catch(IOException e) {
             e.printStackTrace();
         }

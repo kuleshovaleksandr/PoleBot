@@ -1,6 +1,6 @@
 package com.example.polebot.parser;
 
-import com.example.polebot.handler.CallBackUpdateHandler;
+import com.example.polebot.handler.impl.CallBackUpdateHandler;
 import com.example.polebot.model.Currency;
 import com.example.polebot.sender.MessageSender;
 import com.example.polebot.service.CurrencyConversionService;

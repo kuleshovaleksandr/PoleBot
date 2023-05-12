@@ -1,5 +1,6 @@
-package com.example.polebot.handler;
+package com.example.polebot.handler.impl;
 
+import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.parser.CommandParser;
 import com.example.polebot.parser.TextParser;
 import com.example.polebot.service.UserService;
