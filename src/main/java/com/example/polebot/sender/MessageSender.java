@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
@@ -31,6 +32,7 @@ public class MessageSender implements Sender {
     @Autowired private DBAnimationService dbAnimationService;
     @Autowired private GiphyAnimationService giphyAnimationService;
 
+    @Value("${bot.pole.owner}")
     private long chatId;
 
     @SneakyThrows
