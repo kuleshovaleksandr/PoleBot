@@ -20,7 +20,8 @@ public class OggConverter {
     private final String VOICE_OGG_PATH = "./data/voices/savedVoice.ogg";
     private final String VOICE_MP3_PATH = "./data/voices/savedVoice.mp3";
 
-    public void toMp3() {
+    public void toMp3(String fileId) {
+        create(fileId);
         try{
             AudioAttributes audio = new AudioAttributes();
             audio.setCodec("libmp3lame");
@@ -42,7 +43,7 @@ public class OggConverter {
     }
 
     @SneakyThrows
-    public void create(String fileId) {
+    private void create(String fileId) {
         GetFile getFile = GetFile.builder()
                 .fileId(fileId)
                 .build();
