@@ -3,6 +3,8 @@ package com.example.polebot.service;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.SneakyThrows;
 import okhttp3.*;
@@ -14,6 +16,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 
@@ -22,18 +25,76 @@ public class VoiceToTextService {
 
 //    @Value("${open-ai.key}")
 //    private String API_KEY;
-    private static final String API_KEY = "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";
+    private static final String API_KEY = "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";
     private static final String ENGINE_ID = "ada";
+    private static final String GPT_MODEL = "gpt-3.5-turbo";
 
     public void init() {
-        OpenAiService service = new OpenAiService(API_KEY);
-        CompletionRequest completionRequest = CompletionRequest.builder()
-                .prompt("Somebody once told me the world is gonna roll me")
-                .model("ada")
-                .echo(true)
+        String prompt = "tell me a joke about programmers";
+        OpenAiService service = new OpenAiService(API_KEY, Duration.ofSeconds(30));
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model(GPT_MODEL)
+                .temperature(0.8)
+                .messages(List.of(
+                        new ChatMessage("system", "it's a system"),
+                        new ChatMessage("user", prompt)))
                 .build();
-        service.createCompletion(completionRequest).getChoices().forEach(System.out::println);
+        StringBuilder builder = new StringBuilder();
+        service.createChatCompletion(request).getChoices().forEach(choice -> builder.append(choice.getMessage().getContent()));
+        String jsonResponse = builder.toString();
+        System.out.println(jsonResponse);
 
+//        CompletionRequest completionRequest = CompletionRequest.builder()
+//                .prompt("Somebody once told me the world is gonna roll me")
+//                .model("ada")
+//                .echo(true)
+//                .build();
+//        service.createCompletion(completionRequest).getChoices().forEach(System.out::println);
+
+    }
+
+    @SneakyThrows
+    public void getTextResponse() {
+
+//        String endpoint = "https://api.openai.com/v1/engines/davinci/completions";
+//        String prompt = "give me a joke";
+//        String model = "davinci";
+//        int maxTokens = 50;
+//
+//        String requestBody = "{\n"
+//                + "  \"prompt\": \"" + prompt + "\",\n"
+//                + "  \"max_tokens\": " + maxTokens + ",\n"
+//                + "  \"model\": \"" + model + "\"\n"
+//                + "}";
+//        URL url = new URL(endpoint);
+//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//        connection.setRequestMethod("POST");
+//        connection.setRequestProperty("Content-Type", "application/json");
+//        connection.setRequestProperty("Authorization", "Bearer " + API_KEY);
+//        connection.setDoOutput(true);
+//
+//        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+//        writer.write(requestBody);
+//        writer.flush();
+//        writer.close();
+//
+//        BufferedReader responseReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//        StringBuilder responseBuilder = new StringBuilder();
+//        String responseLine;
+//        while ((responseLine = responseReader.readLine()) != null) {
+//            responseBuilder.append(responseLine);
+//        }
+//        String response = responseBuilder.toString();
+
+// Extract the text response from the JSON response
+//        JsonParser parser = new JsonParser();
+//        JsonObject responseObject = parser.parse(response).getAsJsonObject();
+//        JsonArray choicesArray = responseObject.getAsJsonArray("choices");
+//        JsonObject firstChoice = choicesArray.get(0).getAsJsonObject();
+//        String textResponse = firstChoice.get("text").getAsString();
+
+// Print the text response
+//        System.out.println(response);
     }
 
     @SneakyThrows
@@ -86,12 +147,13 @@ public class VoiceToTextService {
 //            e.printStackTrace();
 //            return null;
 //        }
+
 //        byte[] voiceData = Files.readAllBytes(new File(voiceFilePath).toPath());
 //        OkHttpClient client = new OkHttpClient();
 //        RequestBody requestBody = new MultipartBody.Builder()
 //                .setType(MultipartBody.FORM)
 //                .addFormDataPart("engine", ENGINE_ID)
-//                .addFormDataPart("prompt", "Transcribe the following voice message:")
+//                .addFormDataPart("prompt", "tell me a joke about programmers")
 //                .addFormDataPart("file", "savedVoice.mp3", RequestBody.create(MediaType.parse("application/octet-stream"), voiceData))
 //                .build();
 //        Request request = new Request.Builder()
@@ -104,17 +166,18 @@ public class VoiceToTextService {
 //        System.out.println(responseJson);
 //        String transcription = responseJson.split("\"text\": \"")[1].split("\"")[0];
 
-        OpenAiService service = new OpenAiService(API_KEY);
+//        OpenAiService service = new OpenAiService(API_KEY);
 //        File file = new File(voiceFilePath);
-        CompletionRequest completionRequest = CompletionRequest.builder()
+//        CompletionRequest completionRequest = CompletionRequest.builder()
 //                .prompt("Transcribe the following voice message: " + file.getName())
-                .prompt("tell me a joke about programmers")
-                .model("ada")
-                .echo(true)
-                .build();
-        CompletionResult result = service.createCompletion(completionRequest);
-        List<CompletionChoice> choices = result.getChoices();
-        choices.forEach(System.out::println);
+//                .prompt("tell me a joke about programmers")
+//                .model("ada")
+//                .echo(true)
+//                .build();
+//        CompletionResult result = service.createCompletion(completionRequest);
+//        List<CompletionChoice> choices = result.getChoices();
+//        System.out.println(choices);
+//        choices.forEach(System.out::println);
 
 //        APIRequest apiRequest = new APIRequest(API_KEY);
 //        FileReference fileReference = new FileReference(voiceFilePath);
