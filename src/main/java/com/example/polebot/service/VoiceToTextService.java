@@ -25,7 +25,7 @@ public class VoiceToTextService {
 
 //    @Value("${open-ai.key}")
 //    private String API_KEY;
-    private static final String API_KEY = "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";
+    private static final String API_KEY = "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";
     private static final String ENGINE_ID = "ada";
     private static final String GPT_MODEL = "gpt-3.5-turbo";
 
