@@ -10,6 +10,7 @@ import lombok.SneakyThrows;
 import okhttp3.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.json.JsonParser;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -84,15 +85,13 @@ public class VoiceToTextService {
 //            responseBuilder.append(responseLine);
 //        }
 //        String response = responseBuilder.toString();
-
-// Extract the text response from the JSON response
+//
 //        JsonParser parser = new JsonParser();
 //        JsonObject responseObject = parser.parse(response).getAsJsonObject();
 //        JsonArray choicesArray = responseObject.getAsJsonArray("choices");
 //        JsonObject firstChoice = choicesArray.get(0).getAsJsonObject();
 //        String textResponse = firstChoice.get("text").getAsString();
-
-// Print the text response
+//
 //        System.out.println(response);
     }
 

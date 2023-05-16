@@ -25,5 +25,8 @@ public class VoiceUpdateHandler implements UpdateHandler {
 //        voiceToTextService.init();
         String response = chatGptService.getChatGptResponse("tell me a joke about programmers");
         sender.sendMessage(response);
+        String voiceText= chatGptService.getTranscription();
+        sender.sendMessage(voiceText);
+
     }
 }
