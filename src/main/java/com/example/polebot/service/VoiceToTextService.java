@@ -34,7 +34,7 @@ public class VoiceToTextService {
         OpenAiService service = new OpenAiService(API_KEY, Duration.ofSeconds(30));
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(GPT_MODEL)
-                .temperature(0.8)
+                .temperature(0.1)
                 .messages(List.of(
                         new ChatMessage("system", "it's a system"),
                         new ChatMessage("user", prompt)))
@@ -42,7 +42,6 @@ public class VoiceToTextService {
         StringBuilder builder = new StringBuilder();
         service.createChatCompletion(request).getChoices().forEach(choice -> builder.append(choice.getMessage().getContent()));
         String jsonResponse = builder.toString();
-        System.out.println(jsonResponse);
 
 //        CompletionRequest completionRequest = CompletionRequest.builder()
 //                .prompt("Somebody once told me the world is gonna roll me")

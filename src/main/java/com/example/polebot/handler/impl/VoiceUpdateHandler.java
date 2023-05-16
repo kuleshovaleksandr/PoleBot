@@ -23,6 +23,7 @@ public class VoiceUpdateHandler implements UpdateHandler {
 //        String transcription = voiceToTextService.transcribeVoiceMessage("./data/voices/savedVoice.mp3");
 //        sender.sendMessage(transcription);
 //        voiceToTextService.init();
-        chatGptService.getChatGptResponse("интересный факт про теслу");
+        String response = chatGptService.getChatGptResponse("tell me a joke about programmers");
+        sender.sendMessage(response);
     }
 }
