@@ -19,9 +19,10 @@ public class VoiceUpdateHandler implements UpdateHandler {
 
     @Override
     public void handleUpdate(Update update) {
-//        converter.toMp3(update.getMessage().getVoice().getFileId());
-//        String transcription = voiceToTextService.transcribeVoiceMessage("./data/voices/savedVoice.mp3");
-//        sender.sendMessage(transcription);
+        converter.toMp3(update.getMessage().getVoice().getFileId());
+        converter.toWav(update.getMessage().getVoice().getFileId());
+        String transcription = voiceToTextService.transcribeVoiceMessage("./data/voices/savedVoice.wav");
+        sender.sendMessage(transcription);
 //        voiceToTextService.init();
         String response = chatGptService.getChatGptResponse("tell me a joke about programmers");
         sender.sendMessage(response);
