@@ -1,13 +1,13 @@
 package com.example.polebot.service;
 
 import lombok.SneakyThrows;
+import okhttp3.*;
 import org.apache.http.HttpHeaders;
+import org.json.JSONObject;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
@@ -16,7 +16,7 @@ import java.util.Base64;
 @Service
 public class ChatGptService {
 
-    private static final String API_KEY = "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";
+    private static final String API_KEY = "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";
     private static final String GPT_MODEL = "gpt-3.5-turbo";
     private static final String VOICE_MODEL = "whisper-1";
 
@@ -57,6 +57,31 @@ public class ChatGptService {
     }
 
     @SneakyThrows
+    public String requestWhisper() {
+        OkHttpClient client = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("audio/mpeg");
+        File file = new File("./data/voices/savedVoice.mp3");
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("model", VOICE_MODEL)
+                .addFormDataPart("file", file.getAbsolutePath(), RequestBody.create(file, mediaType))
+                .build();
+
+        Request request = new Request.Builder()
+                .url("https://api.openai.com/v1/audio/transcriptions")
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer " + API_KEY)
+                .addHeader("Content-Type", "multipart/form-data")
+                .build();
+
+        Response response = client.newCall(request).execute();
+        JSONObject json = new JSONObject(response.body().string());
+        String voiceText = json.getString("text");
+        return voiceText;
+    }
+
+    @SneakyThrows
     private String getResponse(String requestBody, URL url) {
         StringBuilder response = new StringBuilder();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -77,7 +102,7 @@ public class ChatGptService {
         os.close();
 
         try(BufferedReader responseReader = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+                new InputStreamReader(connection.getInputStream()))) {
             String responseLine;
             while ((responseLine = responseReader.readLine()) != null) {
                 response.append(responseLine.trim());
