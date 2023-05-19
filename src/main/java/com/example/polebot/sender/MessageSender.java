@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
+import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -51,6 +52,30 @@ public class MessageSender implements Sender {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
                 .text(text)
+                .replyMarkup(inlineKeyboardMarkup)
+                .build();
+        bot.execute(message);
+    }
+
+    @SneakyThrows
+    @Override
+    public void replyWithInlineMessageTo(int messageId, String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
+        SendVoice voice = SendVoice.builder()
+                .chatId(chatId)
+                .voice()
+                .replyToMessageId(messageId)
+                .replyMarkup(inlineKeyboardMarkup)
+                .build();
+        bot.execute(message);
+    }
+
+    @SneakyThrows
+    @Override
+    public void replyWithInlineMessageTo(int messageId, String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
+        SendMessage message = SendMessage.builder()
+                .chatId(chatId)
+                .text(text)
+                .replyToMessageId(messageId)
                 .replyMarkup(inlineKeyboardMarkup)
                 .build();
         bot.execute(message);

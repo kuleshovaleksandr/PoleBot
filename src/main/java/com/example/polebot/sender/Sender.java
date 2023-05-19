@@ -11,6 +11,8 @@ public interface Sender {
 
     void sendSticker(InputFile inputFile);
 
+    void replyWithInlineMessageTo(int messageId, String text, InlineKeyboardMarkup inlineKeyboardMarkup);
+
     void editText(int messageId, String text);
 
     void sendInlineMessage(String text, InlineKeyboardMarkup inlineKeyboardMarkup);
