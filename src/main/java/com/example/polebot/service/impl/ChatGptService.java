@@ -43,8 +43,11 @@ public class ChatGptService {
                 .messages(messages)
                 .build();
         StringBuilder response = new StringBuilder();
-        service.createChatCompletion(request).getChoices().forEach(choice -> response.append(choice.getMessage().getContent()));
+        service.createChatCompletion(request)
+                .getChoices()
+                .forEach(choice -> response.append(choice.getMessage().getContent()));
         messages.add(new ChatMessage(OpenAiRole.ASSISTANT.getRole(), response.toString()));
+        //TODO change chatGPT text style and waiting message
         return response.toString();
     }
 
@@ -53,20 +56,17 @@ public class ChatGptService {
         OkHttpClient client = new OkHttpClient();
         MediaType mediaType = MediaType.parse("audio/mpeg");
         File file = new File(AUDIO_FILE_PATH);
-
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("model", VOICE_MODEL)
                 .addFormDataPart("file", file.getAbsolutePath(), RequestBody.create(file, mediaType))
                 .build();
-
         Request request = new Request.Builder()
                 .url(BASE_URL + TRANSCRIPTION_URL)
                 .post(requestBody)
                 .addHeader("Authorization", "Bearer " + API_KEY)
                 .addHeader("Content-Type", "multipart/form-data")
                 .build();
-
         Response response = client.newCall(request).execute();
         JSONObject json = new JSONObject(response.body().string());
         String voiceText = json.getString("text");

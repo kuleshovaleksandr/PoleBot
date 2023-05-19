@@ -21,5 +21,6 @@ public class VoiceUpdateHandler implements UpdateHandler {
         chatGptService.getChatGptResponse("");
         String response = chatGptService.getVoiceTranscription();
         sender.sendMessage(response);
+        //TODO add two buttons to voice message: transcribe and send to ChatGpt
     }
 }
