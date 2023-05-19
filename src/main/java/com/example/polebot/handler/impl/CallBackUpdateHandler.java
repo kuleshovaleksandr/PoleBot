@@ -44,7 +44,7 @@ public class CallBackUpdateHandler implements UpdateHandler {
             sender.sendMessage(chat.getUserName() + " said: " + transcription);
         } else if(callbackData.equals("Send to ChatGPT")) {
             String transcription = chatGptService.getVoiceTranscription();
-            sender.sendMessage("Please wait for request from the server...\n" +
+            sender.sendMessage("Please wait for response from the server...\n" +
                     "Your request: " + transcription);
             String response = chatGptService.getChatGptResponse(transcription);
             sender.sendMessage("ChatGPT: " + response);
