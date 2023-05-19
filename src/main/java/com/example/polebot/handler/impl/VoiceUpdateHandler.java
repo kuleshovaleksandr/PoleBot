@@ -3,8 +3,7 @@ package com.example.polebot.handler.impl;
 import com.example.polebot.converter.OggConverter;
 import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.sender.MessageSender;
-import com.example.polebot.service.ChatGptService;
-import com.example.polebot.service.VoiceToTextService;
+import com.example.polebot.service.impl.ChatGptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -13,23 +12,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class VoiceUpdateHandler implements UpdateHandler {
 
     @Autowired private MessageSender sender;
-    @Autowired private OggConverter converter;
-    @Autowired private VoiceToTextService voiceToTextService;
+    @Autowired private OggConverter oggConverter;
     @Autowired private ChatGptService chatGptService;
 
     @Override
     public void handleUpdate(Update update) {
-        converter.toMp3(update.getMessage().getVoice().getFileId());
-//        converter.toWav(update.getMessage().getVoice().getFileId());
-//        String transcription = voiceToTextService.transcribeVoiceMessage("./data/voices/savedVoice.wav");
-//        sender.sendMessage(transcription);
-//        voiceToTextService.init();
-//        String response = chatGptService.getChatGptResponse("tell me a joke about programmers");
-//        sender.sendMessage(response);
-        String response = chatGptService.requestWhisper();
+        oggConverter.toMp3(update.getMessage().getVoice().getFileId());
+        String response = chatGptService.getVoiceTranscription();
         sender.sendMessage(response);
-//        String voiceText= chatGptService.getTranscription();
-//        sender.sendMessage(voiceText);
-
     }
 }
