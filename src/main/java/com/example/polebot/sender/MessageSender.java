@@ -59,14 +59,13 @@ public class MessageSender implements Sender {
 
     @SneakyThrows
     @Override
-    public void replyWithInlineMessageTo(int messageId, String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
+    public void sendInlineVoice(InputFile inputFile, InlineKeyboardMarkup inlineKeyboardMarkup) {
         SendVoice voice = SendVoice.builder()
                 .chatId(chatId)
-                .voice()
-                .replyToMessageId(messageId)
+                .voice(inputFile)
                 .replyMarkup(inlineKeyboardMarkup)
                 .build();
-        bot.execute(message);
+        bot.execute(voice);
     }
 
     @SneakyThrows

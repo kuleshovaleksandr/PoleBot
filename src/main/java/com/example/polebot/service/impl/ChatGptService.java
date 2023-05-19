@@ -47,7 +47,6 @@ public class ChatGptService {
                 .getChoices()
                 .forEach(choice -> response.append(choice.getMessage().getContent()));
         messages.add(new ChatMessage(OpenAiRole.ASSISTANT.getRole(), response.toString()));
-        //TODO change chatGPT text style and waiting message
         return response.toString();
     }
 

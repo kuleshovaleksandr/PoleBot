@@ -14,6 +14,9 @@ import java.net.URL;
 
 @Service
 public class NbrbCurrencyConversionService implements CurrencyConversionService {
+
+    private final String NBRB_URL = "https://www.nbrb.by/api/exrates/rates/";
+
     @Override
     public double getConversionRatio(Currency original, Currency target) {
         double originalRate = getRate(original);
@@ -27,7 +30,8 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
         }
 
         try {
-            URL url = new URL("https://www.nbrb.by/api/exrates/rates/" + currency.getId());
+            //TODO change connection to okhttp3
+            URL url = new URL(NBRB_URL + currency.getId());
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));

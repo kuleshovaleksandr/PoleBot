@@ -15,5 +15,7 @@ public interface Sender {
 
     void editText(int messageId, String text);
 
+    void sendInlineVoice(InputFile inputFile, InlineKeyboardMarkup inlineKeyboardMarkup);
+
     void sendInlineMessage(String text, InlineKeyboardMarkup inlineKeyboardMarkup);
 }
