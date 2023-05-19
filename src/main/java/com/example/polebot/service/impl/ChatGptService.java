@@ -36,15 +36,15 @@ public class ChatGptService {
     @SneakyThrows
     public String getChatGptResponse(String prompt) {
         OpenAiService service = new OpenAiService(API_KEY, Duration.ofSeconds(60));
+        messages.add(new ChatMessage(OpenAiRole.USER.getRole(), prompt));
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(GPT_MODEL)
                 .temperature(0.9)
-                .messages(List.of(
-                        new ChatMessage(OpenAiRole.SYSTEM.getRole(), "it's a system"),
-                        new ChatMessage(OpenAiRole.USER.getRole(), prompt)))
+                .messages(messages)
                 .build();
         StringBuilder response = new StringBuilder();
         service.createChatCompletion(request).getChoices().forEach(choice -> response.append(choice.getMessage().getContent()));
+        messages.add(new ChatMessage(OpenAiRole.ASSISTANT.getRole(), response.toString()));
         return response.toString();
     }
 
