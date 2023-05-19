@@ -1,5 +1,6 @@
 package com.example.polebot.service.impl;
 
+import com.example.polebot.model.OpenAiRole;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,19 +31,21 @@ public class ChatGptService {
     @Value("${audio.mp3-path}")
     private String AUDIO_FILE_PATH;
 
+    private List<ChatMessage> messages = new ArrayList<>();
+
     @SneakyThrows
     public String getChatGptResponse(String prompt) {
-        OpenAiService service = new OpenAiService(API_KEY, Duration.ofSeconds(30));
+        OpenAiService service = new OpenAiService(API_KEY, Duration.ofSeconds(60));
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(GPT_MODEL)
                 .temperature(0.9)
                 .messages(List.of(
-                        new ChatMessage("system", "it's a system"),
-                        new ChatMessage("user", prompt)))
+                        new ChatMessage(OpenAiRole.SYSTEM.getRole(), "it's a system"),
+                        new ChatMessage(OpenAiRole.USER.getRole(), prompt)))
                 .build();
-        StringBuilder builder = new StringBuilder();
-        service.createChatCompletion(request).getChoices().forEach(choice -> builder.append(choice.getMessage().getContent()));
-        return builder.toString();
+        StringBuilder response = new StringBuilder();
+        service.createChatCompletion(request).getChoices().forEach(choice -> response.append(choice.getMessage().getContent()));
+        return response.toString();
     }
 
     @SneakyThrows

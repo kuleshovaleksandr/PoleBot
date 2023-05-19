@@ -18,6 +18,7 @@ public class VoiceUpdateHandler implements UpdateHandler {
     @Override
     public void handleUpdate(Update update) {
         oggConverter.toMp3(update.getMessage().getVoice().getFileId());
+        chatGptService.getChatGptResponse("");
         String response = chatGptService.getVoiceTranscription();
         sender.sendMessage(response);
     }

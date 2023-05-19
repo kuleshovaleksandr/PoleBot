@@ -4,6 +4,7 @@ import com.example.polebot.PoleBot;
 import com.example.polebot.model.Command;
 import com.example.polebot.model.Currency;
 import com.example.polebot.sender.MessageSender;
+import com.example.polebot.service.impl.ChatGptService;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class CommandParser implements Parser {
 
     @Autowired private MessageSender sender;
     @Autowired private PoleBot bot;
+    @Autowired private ChatGptService chatGptService;
 
     @PostConstruct
     public void initCommands() {
@@ -42,7 +44,15 @@ public class CommandParser implements Parser {
             sender.sendMessage("forecast");
         } else if(message.equals(Command.CURRENCY.getName())) {
             showCurrencyMenu();
+        } else if(message.startsWith("/gpt")) {
+            sendGptRequest(message);
         }
+    }
+
+    private void sendGptRequest(String message) {
+        String chatRequest = message.substring(5);
+        String chatResponse = chatGptService.getChatGptResponse(chatRequest);
+        sender.sendMessage(chatResponse);
     }
 
     @SneakyThrows
