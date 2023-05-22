@@ -4,6 +4,7 @@ import com.example.polebot.PoleBot;
 import com.example.polebot.model.Command;
 import com.example.polebot.model.Currency;
 import com.example.polebot.sender.MessageSender;
+import com.example.polebot.service.ForecastService;
 import com.example.polebot.service.impl.ChatGptService;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
@@ -25,6 +26,7 @@ public class CommandParser implements Parser {
     @Autowired private MessageSender sender;
     @Autowired private PoleBot bot;
     @Autowired private ChatGptService chatGptService;
+    @Autowired private ForecastService forecastService;
 
     @PostConstruct
     public void initCommands() {
@@ -41,7 +43,7 @@ public class CommandParser implements Parser {
         if(message.equals(Command.INFO.getName())) {
             sendInfo();
         } else if(message.equals(Command.FORECAST.getName())) {
-            sender.sendMessage("forecast");
+            forecastService.getCurrentForecast();
         } else if(message.equals(Command.CURRENCY.getName())) {
             showCurrencyMenu();
         } else if(message.startsWith("/gpt")) {
