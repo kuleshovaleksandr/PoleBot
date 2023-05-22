@@ -5,25 +5,17 @@ import com.example.polebot.model.Currency;
 import com.example.polebot.repository.CurrencyRateRepository;
 import com.example.polebot.service.CurrencyConversionService;
 import lombok.SneakyThrows;
-import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.glassfish.grizzly.http.util.TimeStamp;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class NbrbCurrencyConversionService implements CurrencyConversionService {
