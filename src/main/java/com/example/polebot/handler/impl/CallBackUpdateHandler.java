@@ -39,16 +39,24 @@ public class CallBackUpdateHandler implements UpdateHandler {
         if(callbackData.contains(":")) {
             saveCurrencyChoice(callbackData);
         } else if(callbackData.equals("Transcribe")) {
-            Chat chat = voiceUpdateHandler.getChat();
-            String transcription = chatGptService.getVoiceTranscription();
-            sender.sendMessage(chat.getUserName() + " said: " + transcription);
+            sendVoiceTranscription();
         } else if(callbackData.equals("Send to ChatGPT")) {
-            String transcription = chatGptService.getVoiceTranscription();
-            sender.sendMessage("Please wait for response from the server...\n" +
-                    "Your request: " + transcription);
-            String response = chatGptService.getChatGptResponse(transcription);
-            sender.sendMessage("ChatGPT: " + response);
+            sendRequestToChatGpt();
         }
+    }
+
+    private void sendVoiceTranscription() {
+        Chat chat = voiceUpdateHandler.getChat();
+        String transcription = chatGptService.getVoiceTranscription();
+        sender.sendMarkdownMessage("*" + chat.getUserName() + "*: " + transcription);
+    }
+
+    private void sendRequestToChatGpt() {
+        String transcription = chatGptService.getVoiceTranscription();
+        sender.sendMarkdownMessage("_Please wait for response from the server..._\n" +
+                "*Your request*: " + transcription);
+        String response = chatGptService.getChatGptResponse(transcription);
+        sender.sendMarkdownMessage("*ChatGPT*: _" + response + "_");
     }
 
     private void saveCurrencyChoice(String callbackData) {

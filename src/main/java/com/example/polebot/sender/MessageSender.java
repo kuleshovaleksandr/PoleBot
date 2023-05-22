@@ -48,6 +48,17 @@ public class MessageSender implements Sender {
 
     @SneakyThrows
     @Override
+    public void sendMarkdownMessage(String text) {
+        SendMessage message = SendMessage.builder()
+                .chatId(chatId)
+                .text(text)
+                .parseMode("Markdown")
+                .build();
+        bot.execute(message);
+    }
+
+    @SneakyThrows
+    @Override
     public void sendInlineMessage(String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)

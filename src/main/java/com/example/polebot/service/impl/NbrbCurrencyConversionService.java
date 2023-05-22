@@ -33,6 +33,7 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
             //TODO change connection to okhttp3
             URL url = new URL(NBRB_URL + currency.getId());
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(3000);
             con.setRequestMethod("GET");
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String inputLine;

@@ -38,8 +38,8 @@ public class CommandParser implements Parser {
     @Override
     public void parse(long chatId, String message) {
         sender.setChatId(chatId);
-        if(message.equals(Command.JOKE.getName())) {
-            sender.sendMessage("joke");
+        if(message.equals(Command.INFO.getName())) {
+            sendInfo();
         } else if(message.equals(Command.FORECAST.getName())) {
             sender.sendMessage("forecast");
         } else if(message.equals(Command.CURRENCY.getName())) {
@@ -47,6 +47,10 @@ public class CommandParser implements Parser {
         } else if(message.startsWith("/gpt")) {
             sendGptRequest(message);
         }
+    }
+
+    private void sendInfo() {
+        sender.sendMessage("info");
     }
 
     private void sendGptRequest(String message) {

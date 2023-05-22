@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @RequiredArgsConstructor
 public enum Command {
-    JOKE("/joke", "give a random joke"),
+    INFO("/info", "give info about bot commands"),
     FORECAST("/forecast", "give a forecast in your region"),
     CURRENCY("/currency", "change currency"),
     NEW("/new", "generate new session");
