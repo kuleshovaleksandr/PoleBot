@@ -1,8 +1,18 @@
 package com.example.polebot.service.impl;
 
+import com.example.polebot.entity.CurrencyRate;
 import com.example.polebot.model.Currency;
+import com.example.polebot.repository.CurrencyRateRepository;
 import com.example.polebot.service.CurrencyConversionService;
+import lombok.SneakyThrows;
+import okhttp3.OkHttp;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.glassfish.grizzly.http.util.TimeStamp;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -11,9 +21,14 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class NbrbCurrencyConversionService implements CurrencyConversionService {
+
+    @Autowired private CurrencyRateRepository currencyRateRepository;
 
     private final String NBRB_URL = "https://www.nbrb.by/api/exrates/rates/";
 
@@ -30,27 +45,45 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
         }
 
         try {
-            //TODO change connection to okhttp3
-            URL url = new URL(NBRB_URL + currency.getId());
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(3000);
-            con.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            JSONObject json = new JSONObject(response.toString());
+            JSONObject json = new JSONObject(getResponse(currency));
             double scale = json.getDouble("Cur_Scale");
             double rate = json.getDouble("Cur_OfficialRate");
             return rate / scale;
         } catch(ConnectException e) {
-            //TODO load hardcoded currency rates
+            CurrencyRate currencyRate = currencyRateRepository.findById(currency.getId()).get();
+            double scale = currencyRate.getScale();
+            double rate = currencyRate.getRate();
+            return rate / scale;
         } catch(IOException e) {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    private String getResponse(Currency currency) throws IOException{
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .get()
+                .url(NBRB_URL + currency.getId())
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.peekBody(2048).string();
+    }
+
+    @SneakyThrows
+    @Scheduled(cron="${cron.scheduler.currency-rate}")
+    private void saveCurrencyRates() {
+        for(Currency currency: Currency.values()) {
+            CurrencyRate currencyRate = new CurrencyRate();
+            if(currency != Currency.BYN) {
+                JSONObject json = new JSONObject(getResponse(currency));
+                currencyRate.setId(currency.getId());
+                currencyRate.setCurrency(currency);
+                currencyRate.setScale(json.getDouble("Cur_Scale"));
+                currencyRate.setRate(json.getDouble("Cur_OfficialRate"));
+                currencyRate.setDate(new Timestamp(System.currentTimeMillis()));
+                currencyRateRepository.save(currencyRate);
+            }
+        }
     }
 }

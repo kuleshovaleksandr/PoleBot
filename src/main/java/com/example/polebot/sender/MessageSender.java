@@ -129,7 +129,7 @@ public class MessageSender implements Sender {
     }
 
     @SneakyThrows
-    @Scheduled(cron="${cron.scheduler}")
+    @Scheduled(cron="${cron.scheduler.animation}")
     private void sendWeekDayAnimation() {
         Date date = new Date();
         Calendar calendar = Calendar.getInstance();
