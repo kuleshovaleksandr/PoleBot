@@ -21,14 +21,14 @@ public enum NeuralLoveArtStyle {
     PHOTO("photo"),
     TAROT("tarot"),
     IMPASTO_OIL("impasto oil"),
-    CHILD_DRAWING("child drawing"),
-    GAME_LOADING_SCREEN("game loading screen"),
     SALADWAVE("saladwave"),
     WOOLWORLD("woolworld"),
     SYNTHWAVE("synthwave"),
     MIDJOURNEY("midjourney"),
     XMAS("xmas"),
-    DEBUG("debug");
+    DEBUG("debug"),
+    CHILD_DRAWING("child drawing"),
+    GAME_LOADING_SCREEN("game loading screen"),;
 
     private final String style;
 }

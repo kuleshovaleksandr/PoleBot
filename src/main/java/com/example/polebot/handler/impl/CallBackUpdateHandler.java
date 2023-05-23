@@ -2,8 +2,11 @@ package com.example.polebot.handler.impl;
 
 import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.model.Currency;
+import com.example.polebot.model.NeuralLoveArtStyle;
+import com.example.polebot.parser.CommandParser;
 import com.example.polebot.sender.MessageSender;
 import com.example.polebot.service.impl.ChatGptService;
+import com.example.polebot.service.impl.NeuralLoveService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,9 +26,12 @@ public class CallBackUpdateHandler implements UpdateHandler {
 
     @Autowired private MessageSender sender;
     @Autowired private ChatGptService chatGptService;
+    @Autowired private NeuralLoveService neuralLoveService;
     @Autowired private VoiceUpdateHandler voiceUpdateHandler;
+    @Autowired private CommandParser commandParser;
 
     private HashMap<String, Currency> currencyChoice = new HashMap<>();
+    private String callbackData;
 
     @PostConstruct
     public void init() {
@@ -42,6 +49,20 @@ public class CallBackUpdateHandler implements UpdateHandler {
             sendVoiceTranscription();
         } else if(callbackData.equals("Send to ChatGPT")) {
             sendRequestToChatGpt();
+        } else {
+            for(NeuralLoveArtStyle style: NeuralLoveArtStyle.values()) {
+                if(callbackData.equals(style.toString())) {
+                    sendGeneratedImage(commandParser.getImageRequest(), style.getStyle());
+                }
+            }
+        }
+    }
+
+    private void sendGeneratedImage(String request, String style) {
+        sender.sendMarkdownMessage("_Wait while your image is being generated..._");
+        List<String> imageUrlList = neuralLoveService.generateImage(request, style);
+        for(String imageUrl: imageUrlList) {
+            sender.sendPhoto(imageUrl);
         }
     }
 

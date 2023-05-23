@@ -1,5 +1,6 @@
 package com.example.polebot.service.impl;
 
+import com.example.polebot.model.NeuralLoveArtLayout;
 import lombok.SneakyThrows;
 import okhttp3.*;
 import org.json.JSONArray;
@@ -26,13 +27,13 @@ public class NeuralLoveService {
     private final Integer NUMBER_OF_IMAGES = 1;
 
     @SneakyThrows
-    public List<String> generateImage(String prompt, String style, String layout) {
+    public List<String> generateImage(String prompt, String style) {
         imagesIsReady = false;
         OkHttpClient client = new OkHttpClient();
         JSONObject jsonRequest = new JSONObject();
         jsonRequest.put("prompt", prompt);
         jsonRequest.put("style", style);
-        jsonRequest.put("layout", layout);
+        jsonRequest.put("layout", NeuralLoveArtLayout.SQUARE.getLayout());
         jsonRequest.put("amount", NUMBER_OF_IMAGES);
         jsonRequest.put("isHd", false);
 
