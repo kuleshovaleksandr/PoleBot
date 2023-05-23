@@ -51,11 +51,11 @@ public class TextParser implements Parser {
                 Currency originalCurrency = currencyChoice.get("ORIGINAL");
                 Currency targetCurrency = currencyChoice.get("TARGET");
                 double conversionRatio = currencyConversionService.getConversionRatio(originalCurrency, targetCurrency);
-                callBackUpdateHandler.init();
+                callBackUpdateHandler.setDefaultValues();
                 String text = String.format("%4.2f %s is %4.2f %s", value, originalCurrency, (value * conversionRatio), targetCurrency);
                 sender.sendMessage(text);
             } catch (NumberFormatException e) {
-                sender.sendMessage("Please enter a number");
+                sender.sendMarkdownMessage("_Please enter a number_");
             }
         }
     }

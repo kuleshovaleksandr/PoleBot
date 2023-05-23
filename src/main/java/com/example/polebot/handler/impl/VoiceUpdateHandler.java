@@ -3,6 +3,7 @@ package com.example.polebot.handler.impl;
 import com.example.polebot.converter.OggConverter;
 import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.sender.MessageSender;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -20,6 +21,7 @@ public class VoiceUpdateHandler implements UpdateHandler {
     @Autowired private MessageSender sender;
     @Autowired private OggConverter oggConverter;
 
+    @Getter
     private Chat chat;
     private final String TRANSCRIBE = "Transcribe";
     private final String SEND_TO_CHAT_GPT = "Send to ChatGPT";
@@ -48,9 +50,5 @@ public class VoiceUpdateHandler implements UpdateHandler {
         );
         String text = "What should I do with this voice message?";
         sender.replyWithInlineMessageTo(messageId, text, InlineKeyboardMarkup.builder().keyboard(buttons).build());
-    }
-
-    public Chat getChat() {
-        return chat;
     }
 }

@@ -19,6 +19,6 @@ public class StickerUpdateHandler implements UpdateHandler {
         String fileId = sticker.getFileId();
         String name = sticker.getSetName();
         String emoji = sticker.getEmoji();
-        stickerService.saveSticker(id, fileId, name, emoji);
+//        stickerService.saveSticker(id, fileId, name, emoji);
     }
 }

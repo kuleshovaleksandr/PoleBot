@@ -23,12 +23,12 @@ public class NeuralLoveService {
     @Value("${neural.love.price-url}")
     private String NEURAL_LOVE_PRICE_URL;
 
-    private boolean imagesIsReady = false;
+    private boolean imageIsReady = false;
     private final Integer NUMBER_OF_IMAGES = 1;
 
     @SneakyThrows
     public List<String> generateImage(String prompt, String style) {
-        imagesIsReady = false;
+        imageIsReady = false;
         OkHttpClient client = new OkHttpClient();
         JSONObject jsonRequest = new JSONObject();
         jsonRequest.put("prompt", prompt);
@@ -67,17 +67,19 @@ public class NeuralLoveService {
                 .build();
 
         JSONObject json = null;
+        JSONArray outputArray = null;
 
-        while(!imagesIsReady) {
+        while(!imageIsReady) {
             Thread.sleep(5000);
             Response response = client.newCall(request).execute();
             json = new JSONObject(response.body().string());
             System.out.println(json);
             JSONObject status = json.getJSONObject("status");
-            imagesIsReady = status.getBoolean("isReady");
+            outputArray = json.getJSONArray("output");
+            imageIsReady = status.getBoolean("isReady");
         }
 
-        JSONArray outputArray = json.getJSONArray("output");
+
         List<String> imageUrlList = new ArrayList();
 
         if(outputArray != null) {

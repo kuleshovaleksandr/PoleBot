@@ -6,8 +6,6 @@ import com.example.polebot.model.Currency;
 import com.example.polebot.model.NeuralLoveArtStyle;
 import com.example.polebot.sender.MessageSender;
 import com.example.polebot.service.impl.ChatGptService;
-import com.example.polebot.service.impl.NeuralLoveService;
-import com.example.polebot.service.impl.YandexForecastService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
-import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -24,20 +21,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Getter
 @Component
 public class CommandParser implements Parser {
 
     @Autowired private MessageSender sender;
     @Autowired private PoleBot bot;
     @Autowired private ChatGptService chatGptService;
-    @Autowired private NeuralLoveService neuralLoveService;
-    @Autowired private YandexForecastService yandexForecastService;
 
+    @Getter
     private String imageRequest;
+    private final String INFO_MESSAGE = "*/currency* - this command shows you a menu where " +
+            "you can choose _original_ and _target_ currencies. " +
+            "Next message has to contain a number you want to change. " +
+            "Currency rates are taken from *National Bank of the Republic of Belarus*.\n\n" +
+            "*/gpt {your request}* - send your request to *ChatGpt*.\n\n" +
+            "*/image {your request}* - send your request to *AI Image Generator*. " +
+            "Then you should choose style of your image from a menu.\n\n" +
+            "You can transcribe you voice message to text " +
+            "and send it to *ChatGpt* as well.";
 
     @PostConstruct
-    public void initCommands() {
+    private void initCommands() {
         try {
             bot.execute(new SetMyCommands(Command.getBotCommands(), new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
@@ -49,26 +53,20 @@ public class CommandParser implements Parser {
     public void parse(long chatId, String message) {
         sender.setChatId(chatId);
         if(message.equals(Command.INFO.getName())) {
-            sendInfo();
-        } else if(message.equals(Command.FORECAST.getName())) {
-//            yandexForecastService.getCurrentForecast();
+            sender.sendMarkdownMessage(INFO_MESSAGE);
         } else if(message.equals(Command.CURRENCY.getName())) {
             showCurrencyMenu();
         } else if(message.startsWith("/gpt")) {
             sendGptRequest(message);
         } else if(message.startsWith("/image")) {
+            //TODO check if request exists
             imageRequest = message.substring(7);
             showImageStyleMenu();
         }
     }
 
-    private void sendInfo() {
-        sender.sendMessage("info");
-    }
-
-
-
     private void sendGptRequest(String message) {
+        //TODO check if request exists
         String request = message.substring(5);
         String response = chatGptService.getChatGptResponse(request);
         sender.sendMessage(response);

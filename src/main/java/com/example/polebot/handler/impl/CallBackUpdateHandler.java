@@ -9,7 +9,6 @@ import com.example.polebot.service.impl.ChatGptService;
 import com.example.polebot.service.impl.NeuralLoveService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -19,8 +18,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.HashMap;
 import java.util.List;
 
-@Getter
-@Setter
 @Component
 public class CallBackUpdateHandler implements UpdateHandler {
 
@@ -30,11 +27,11 @@ public class CallBackUpdateHandler implements UpdateHandler {
     @Autowired private VoiceUpdateHandler voiceUpdateHandler;
     @Autowired private CommandParser commandParser;
 
+    @Getter
     private HashMap<String, Currency> currencyChoice = new HashMap<>();
-    private String callbackData;
 
     @PostConstruct
-    public void init() {
+    public void setDefaultValues() {
         currencyChoice.put("ORIGINAL", null);
         currencyChoice.put("TARGET", null);
     }

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public enum Command {
     INFO("/info", "give info about bot commands"),
-    FORECAST("/forecast", "give a forecast in your region"),
     CURRENCY("/currency", "change currency");
 
     private final String name;

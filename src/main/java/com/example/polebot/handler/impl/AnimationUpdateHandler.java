@@ -18,6 +18,6 @@ public class AnimationUpdateHandler implements UpdateHandler {
         String id = animation.getFileUniqueId();
         String fileId = animation.getFileId();
         String name = animation.getFileName();
-        animationService.saveAnimation(id, fileId, name);
+//        animationService.saveAnimation(id, fileId, name);
     }
 }
