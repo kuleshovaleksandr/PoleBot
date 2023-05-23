@@ -1,19 +1,24 @@
-package com.example.polebot.service;
+package com.example.polebot.service.impl;
 
+import com.example.polebot.service.ForecastService;
 import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GismeteoForecastService implements ForecastService {
 
-    private final String GISMETEO_URL = "https://api.gismeteo.net/v2/weather/current";
-    private final String GISMETEO_TOKEN = "56b30cb255.3443075";
+    @Value("${gismeteo.forecast.url}")
+    private String GISMETEO_URL;
 
-    public void getCurrentForecast() {
+    private String GISMETEO_TOKEN;
+
+    public String getCurrentForecast() {
         System.out.println(getResponse());
+        return "";
     }
 
     @SneakyThrows

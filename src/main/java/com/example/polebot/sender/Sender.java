@@ -11,6 +11,8 @@ public interface Sender {
 
     void sendSticker(InputFile inputFile);
 
+    void sendPhoto(String imageUrl);
+
     void sendMarkdownMessage(String text);
 
     void replyWithInlineMessageTo(int messageId, String text, InlineKeyboardMarkup inlineKeyboardMarkup);

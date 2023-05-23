@@ -4,8 +4,9 @@ import com.example.polebot.PoleBot;
 import com.example.polebot.model.Command;
 import com.example.polebot.model.Currency;
 import com.example.polebot.sender.MessageSender;
-import com.example.polebot.service.ForecastService;
 import com.example.polebot.service.impl.ChatGptService;
+import com.example.polebot.service.impl.NeuralLoveService;
+import com.example.polebot.service.impl.YandexForecastService;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,8 @@ public class CommandParser implements Parser {
     @Autowired private MessageSender sender;
     @Autowired private PoleBot bot;
     @Autowired private ChatGptService chatGptService;
-    @Autowired private ForecastService forecastService;
+    @Autowired private NeuralLoveService neuralLoveService;
+    @Autowired private YandexForecastService yandexForecastService;
 
     @PostConstruct
     public void initCommands() {
@@ -43,11 +45,13 @@ public class CommandParser implements Parser {
         if(message.equals(Command.INFO.getName())) {
             sendInfo();
         } else if(message.equals(Command.FORECAST.getName())) {
-            forecastService.getCurrentForecast();
+            yandexForecastService.getCurrentForecast();
         } else if(message.equals(Command.CURRENCY.getName())) {
             showCurrencyMenu();
         } else if(message.startsWith("/gpt")) {
             sendGptRequest(message);
+        } else if(message.startsWith("/image")) {
+            sendGeneratedImage(message);
         }
     }
 
@@ -55,10 +59,18 @@ public class CommandParser implements Parser {
         sender.sendMessage("info");
     }
 
+    private void sendGeneratedImage(String message) {
+        String request = message.substring(7);
+        List<String> imageUrlList = neuralLoveService.generateImage(request, "fantasy", "square");
+        for(String imageUrl: imageUrlList) {
+            sender.sendPhoto(imageUrl);
+        }
+    }
+
     private void sendGptRequest(String message) {
-        String chatRequest = message.substring(5);
-        String chatResponse = chatGptService.getChatGptResponse(chatRequest);
-        sender.sendMessage(chatResponse);
+        String request = message.substring(5);
+        String response = chatGptService.getChatGptResponse(request);
+        sender.sendMessage(response);
     }
 
     @SneakyThrows

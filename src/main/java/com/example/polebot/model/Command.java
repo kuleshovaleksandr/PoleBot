@@ -13,8 +13,7 @@ import java.util.stream.Collectors;
 public enum Command {
     INFO("/info", "give info about bot commands"),
     FORECAST("/forecast", "give a forecast in your region"),
-    CURRENCY("/currency", "change currency"),
-    NEW("/new", "generate new session");
+    CURRENCY("/currency", "change currency");
 
     private final String name;
     private final String desc;

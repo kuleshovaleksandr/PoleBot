@@ -6,6 +6,7 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.SneakyThrows;
 import okhttp3.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ public class ChatGptService {
     private String BASE_URL;
     @Value("${openai-service.urls.transcription-url}")
     private String TRANSCRIPTION_URL;
+    @Value("${openai-service.urls.image-url}")
+    private String IMAGE_URL;
     @Value("${openai-service.api-key}")
     private String API_KEY;
     @Value("${openai-service.gpt-model}")
@@ -31,7 +34,32 @@ public class ChatGptService {
     @Value("${audio.mp3-path}")
     private String AUDIO_FILE_PATH;
 
+    private final Integer NUMBER_OF_IMAGES= 1;
     private List<ChatMessage> messages = new ArrayList<>();
+
+    @SneakyThrows
+    public String getGeneratedImageUrl(String prompt) {
+        OkHttpClient client = new OkHttpClient();
+
+        JSONObject jsonRequest = new JSONObject();
+        jsonRequest.put("prompt", prompt);
+        jsonRequest.put("n", NUMBER_OF_IMAGES);
+
+        RequestBody requestBody = RequestBody.create(
+                jsonRequest.toString(),
+                MediaType.get("application/json; charset=utf-8"));
+        Request request = new Request.Builder()
+                .url(BASE_URL + IMAGE_URL)
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer " + API_KEY)
+                .addHeader("Content-Type", "application/json")
+                .build();
+        Response response = client.newCall(request).execute();
+        JSONObject json = new JSONObject(response.body().string());
+        JSONArray data = json.getJSONArray("data");
+        JSONObject imageUrlJsonObject = data.getJSONObject(0);
+        return imageUrlJsonObject.getString("url");
+    }
 
     @SneakyThrows
     public String getChatGptResponse(String prompt) {
