@@ -5,6 +5,7 @@ import com.example.polebot.model.Command;
 import com.example.polebot.model.Currency;
 import com.example.polebot.model.NeuralLoveArtStyle;
 import com.example.polebot.sender.MessageSender;
+import com.example.polebot.service.HumorService;
 import com.example.polebot.service.impl.ChatGptService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class CommandParser implements Parser {
     @Autowired private MessageSender sender;
     @Autowired private PoleBot bot;
     @Autowired private ChatGptService chatGptService;
+    @Autowired private HumorService humorService;
 
     @Getter
     private String imageRequest;
@@ -54,6 +56,10 @@ public class CommandParser implements Parser {
         sender.setChatId(chatId);
         if(message.equals(Command.INFO.getName())) {
             sender.sendMarkdownMessage(INFO_MESSAGE);
+        } else if(message.equals(Command.JOKE.getName())) {
+            sender.sendMessage(humorService.getRandomJoke());
+        } else if(message.equals(Command.MEME.getName())) {
+
         } else if(message.equals(Command.CURRENCY.getName())) {
             showCurrencyMenu();
         } else if(message.startsWith("/gpt")) {
