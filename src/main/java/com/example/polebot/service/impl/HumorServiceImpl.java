@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class HumorServiceImpl implements HumorService {
@@ -22,18 +20,20 @@ public class HumorServiceImpl implements HumorService {
     @Value("${humor.api.key}")
     private String API_KEY;
 
-    private final String MIN_RATING = "8";
+    private final String MIN_RATING = "9";
     private final String NUMBER_OF_JOKES = "1";
 
     @Override
     public String searchJoke(String request) {
+        System.out.println("request = " + request);
         HttpUrl httpUrl = HttpUrl.parse(BASE_API_URL + "jokes/search").newBuilder()
                 .addQueryParameter("api-key", API_KEY)
                 .addQueryParameter("min-rating", MIN_RATING)
                 .addQueryParameter("number", NUMBER_OF_JOKES)
-                .addQueryParameter("keywords", parseRequestToKeywords(request))
+                .addQueryParameter("keywords", request)
                 .build();
         JSONObject json = getJsonResponse(httpUrl);
+        System.out.println(json);
         JSONArray jsonArray = json.getJSONArray("jokes");
         JSONObject jsonObject = jsonArray.getJSONObject(0);
         String joke = jsonObject.getString("joke");
@@ -57,9 +57,10 @@ public class HumorServiceImpl implements HumorService {
                 .addQueryParameter("api-key", API_KEY)
                 .addQueryParameter("min-rating", MIN_RATING)
                 .addQueryParameter("number", NUMBER_OF_JOKES)
-                .addQueryParameter("keywords", parseRequestToKeywords(request))
+                .addQueryParameter("keywords", request)
                 .build();
         JSONObject json = getJsonResponse(httpUrl);
+        System.out.println(json);
         JSONArray jsonArray = json.getJSONArray("memes");
         JSONObject jsonObject = jsonArray.getJSONObject(0);
         String memeUrl = jsonObject.getString("url");
@@ -95,13 +96,5 @@ public class HumorServiceImpl implements HumorService {
             e.printStackTrace();
         }
         return json;
-    }
-
-    private String parseRequestToKeywords(String request) {
-        request = request.trim();
-        Pattern pattern = Pattern.compile("[[,\\s]\\s]");
-        Matcher matcher = pattern.matcher(request);
-        request = matcher.replaceAll(",");
-        return request;
     }
 }

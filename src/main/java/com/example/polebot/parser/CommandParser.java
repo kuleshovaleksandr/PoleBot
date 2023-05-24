@@ -21,6 +21,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class CommandParser implements Parser {
@@ -59,9 +61,15 @@ public class CommandParser implements Parser {
         } else if(message.equals(Command.JOKE.getName())) {
             sender.sendMessage(humorService.getRandomJoke());
         } else if(message.equals(Command.MEME.getName())) {
-
+            sender.sendPhoto(humorService.getRandomMeme());
         } else if(message.equals(Command.CURRENCY.getName())) {
             showCurrencyMenu();
+        } else if(message.startsWith(Command.JOKE.getName())
+                && message.length() > Command.JOKE.getName().length()) {
+            sendJokeWithRequest(parseHumorRequest(message));
+        } else if(message.startsWith(Command.MEME.getName())
+                && message.length() > Command.MEME.getName().length()) {
+            sendMemeWithRequest(parseHumorRequest(message));
         } else if(message.startsWith("/gpt")) {
             sendGptRequest(message);
         } else if(message.startsWith("/image")) {
@@ -69,6 +77,26 @@ public class CommandParser implements Parser {
             imageRequest = message.substring(7);
             showImageStyleMenu();
         }
+    }
+
+    private void sendJokeWithRequest(String request) {
+        String joke = humorService.searchJoke(request);
+        sender.sendMessage(joke);
+    }
+
+    private void sendMemeWithRequest(String request) {
+        String memeUrl = humorService.searchMeme(request);
+        sender.sendPhoto(memeUrl);
+    }
+
+    private String parseHumorRequest(String message) {
+        System.out.println("message = " + message);
+        String request = message.substring(6);
+        request = request.trim();
+        Pattern pattern = Pattern.compile("[[,\\s]\\s]");
+        Matcher matcher = pattern.matcher(request);
+        request = matcher.replaceAll(",");
+        return request;
     }
 
     private void sendGptRequest(String message) {
