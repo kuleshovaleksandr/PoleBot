@@ -1,5 +1,6 @@
 package com.example.polebot.service.impl;
 
+import com.example.polebot.exception.ConnectionTimeOutException;
 import com.example.polebot.model.NeuralLoveArtLayout;
 import lombok.SneakyThrows;
 import okhttp3.*;
@@ -7,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,12 +54,12 @@ public class NeuralLoveService {
         Response response = client.newCall(request).execute();
         JSONObject json = new JSONObject(response.body().string());
         String orderId = json.getString("orderId");
-        System.out.println("orderId = " + orderId);
         return getImageResult(orderId);
     }
 
     @SneakyThrows
     private List<String> getImageResult(String orderId) {
+        int connectionCount = 0;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(NEURAL_LOVE_RESULT_URL + orderId)
@@ -66,19 +68,19 @@ public class NeuralLoveService {
                 .addHeader("Accept", "application/json")
                 .build();
 
-        JSONObject json = null;
-        JSONArray outputArray = null;
+        JSONArray outputArray;
 
-        while(!imageIsReady) {
+        do {
+            if (++connectionCount > 10) {
+                throw new ConnectionTimeOutException("Server does not response. Try again or Later.");
+            }
             Thread.sleep(5000);
             Response response = client.newCall(request).execute();
-            json = new JSONObject(response.body().string());
-            System.out.println(json);
+            JSONObject json = new JSONObject(response.body().string());
             JSONObject status = json.getJSONObject("status");
             outputArray = json.getJSONArray("output");
             imageIsReady = status.getBoolean("isReady");
-        }
-
+        } while(!imageIsReady && outputArray.isEmpty());
 
         List<String> imageUrlList = new ArrayList();
 
