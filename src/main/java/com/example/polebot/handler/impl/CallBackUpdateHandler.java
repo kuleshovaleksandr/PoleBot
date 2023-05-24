@@ -1,5 +1,6 @@
 package com.example.polebot.handler.impl;
 
+import com.example.polebot.exception.ConnectionTimeOutException;
 import com.example.polebot.handler.UpdateHandler;
 import com.example.polebot.model.Currency;
 import com.example.polebot.model.NeuralLoveArtStyle;
@@ -57,9 +58,13 @@ public class CallBackUpdateHandler implements UpdateHandler {
 
     private void sendGeneratedImage(String request, String style) {
         sender.sendMarkdownMessage("_Wait while your image is being generated..._");
-        List<String> imageUrlList = neuralLoveService.generateImage(request, style);
-        for(String imageUrl: imageUrlList) {
-            sender.sendPhoto(imageUrl);
+        try {
+            List<String> imageUrlList = neuralLoveService.generateImage(request, style);
+            for(String imageUrl: imageUrlList) {
+                sender.sendPhoto(imageUrl);
+            }
+        } catch(ConnectionTimeOutException e) {
+            sender.sendMarkdownMessage("_" + e.getMessage() + "_");
         }
     }
 

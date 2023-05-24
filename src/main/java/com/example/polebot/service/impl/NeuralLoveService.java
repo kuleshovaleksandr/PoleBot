@@ -2,14 +2,13 @@ package com.example.polebot.service.impl;
 
 import com.example.polebot.exception.ConnectionTimeOutException;
 import com.example.polebot.model.NeuralLoveArtLayout;
-import lombok.SneakyThrows;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +27,7 @@ public class NeuralLoveService {
     private boolean imageIsReady = false;
     private final Integer NUMBER_OF_IMAGES = 1;
 
-    @SneakyThrows
-    public List<String> generateImage(String prompt, String style) {
+    public List<String> generateImage(String prompt, String style) throws ConnectionTimeOutException {
         imageIsReady = false;
         OkHttpClient client = new OkHttpClient();
         JSONObject jsonRequest = new JSONObject();
@@ -51,14 +49,18 @@ public class NeuralLoveService {
                 .addHeader("Content-Type", "application/json")
                 .build();
 
-        Response response = client.newCall(request).execute();
-        JSONObject json = new JSONObject(response.body().string());
-        String orderId = json.getString("orderId");
+        String orderId = null;
+        try {
+            Response response = client.newCall(request).execute();
+            JSONObject json = new JSONObject(response.body().string());
+            orderId = json.getString("orderId");
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
         return getImageResult(orderId);
     }
 
-    @SneakyThrows
-    private List<String> getImageResult(String orderId) {
+    private List<String> getImageResult(String orderId) throws ConnectionTimeOutException {
         int connectionCount = 0;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -68,21 +70,25 @@ public class NeuralLoveService {
                 .addHeader("Accept", "application/json")
                 .build();
 
-        JSONArray outputArray;
+        JSONArray outputArray = null;
 
         do {
             if (++connectionCount > 10) {
-                throw new ConnectionTimeOutException("Server does not response. Try again or Later.");
+                throw new ConnectionTimeOutException("Server does not response. Try again or later.");
             }
-            Thread.sleep(5000);
-            Response response = client.newCall(request).execute();
-            JSONObject json = new JSONObject(response.body().string());
-            JSONObject status = json.getJSONObject("status");
-            outputArray = json.getJSONArray("output");
-            imageIsReady = status.getBoolean("isReady");
+            try {
+                Thread.sleep(6000);
+                Response response = client.newCall(request).execute();
+                JSONObject json = new JSONObject(response.body().string());
+                JSONObject status = json.getJSONObject("status");
+                outputArray = json.getJSONArray("output");
+                imageIsReady = status.getBoolean("isReady");
+            } catch(InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
         } while(!imageIsReady && outputArray.isEmpty());
 
-        List<String> imageUrlList = new ArrayList();
+        ArrayList imageUrlList = new ArrayList();
 
         if(outputArray != null) {
             for(int i = 0; i < outputArray.length(); i++) {
