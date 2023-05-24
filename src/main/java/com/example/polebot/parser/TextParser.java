@@ -4,6 +4,7 @@ import com.example.polebot.handler.impl.CallBackUpdateHandler;
 import com.example.polebot.model.Currency;
 import com.example.polebot.sender.MessageSender;
 import com.example.polebot.service.CurrencyConversionService;
+import com.example.polebot.service.impl.ChatGptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +16,12 @@ import java.util.regex.Pattern;
 public class TextParser implements Parser {
 
     @Autowired private MessageSender sender;
+    @Autowired private ChatGptService chatGptService;
     @Autowired private CallBackUpdateHandler callBackUpdateHandler;
     @Autowired private CurrencyConversionService currencyConversionService;
+
+    private final String TESLA_REQUEST = "расскажи смешную шутку про автомобиль тесла";
+    private final String KOREA_REQUEST = "расскажи интересный факт про Корею";
 
     @Override
     public void parse(long chatId, String message) {
@@ -30,7 +35,8 @@ public class TextParser implements Parser {
         Pattern pattern = Pattern.compile("[Тт]есл.");
         Matcher matcher = pattern.matcher(message);
         while(matcher.find()) {
-            sender.sendMessage("you typed \"Тесла\"");
+            sender.sendMarkdownMessage("*ChatGPT*: " +
+                    "_" + chatGptService.getChatGptResponse(TESLA_REQUEST) + "_");
         }
     }
 
@@ -38,7 +44,8 @@ public class TextParser implements Parser {
         Pattern pattern = Pattern.compile("[Кк]оре.");
         Matcher matcher = pattern.matcher(message);
         while(matcher.find()) {
-            sender.sendMessage("you typed \"Корея\"");
+            sender.sendMarkdownMessage("*ChatGPT*: " +
+                    "_" + chatGptService.getChatGptResponse(KOREA_REQUEST) + "_");
         }
     }
 

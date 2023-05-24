@@ -58,18 +58,8 @@ public class CommandParser implements Parser {
         sender.setChatId(chatId);
         if(message.equals(Command.INFO.getName())) {
             sender.sendMarkdownMessage(INFO_MESSAGE);
-        } else if(message.equals(Command.JOKE.getName())) {
-            sender.sendMessage(humorService.getRandomJoke());
-        } else if(message.equals(Command.MEME.getName())) {
-            sender.sendPhoto(humorService.getRandomMeme());
         } else if(message.equals(Command.CURRENCY.getName())) {
             showCurrencyMenu();
-        } else if(message.startsWith(Command.JOKE.getName())
-                && message.length() > Command.JOKE.getName().length()) {
-            sendJokeWithRequest(parseHumorRequest(message));
-        } else if(message.startsWith(Command.MEME.getName())
-                && message.length() > Command.MEME.getName().length()) {
-            sendMemeWithRequest(parseHumorRequest(message));
         } else if(message.startsWith("/gpt")) {
             sendGptRequest(message);
         } else if(message.startsWith("/image")) {
@@ -79,31 +69,11 @@ public class CommandParser implements Parser {
         }
     }
 
-    private void sendJokeWithRequest(String request) {
-        String joke = humorService.searchJoke(request);
-        sender.sendMessage(joke);
-    }
-
-    private void sendMemeWithRequest(String request) {
-        String memeUrl = humorService.searchMeme(request);
-        sender.sendPhoto(memeUrl);
-    }
-
-    private String parseHumorRequest(String message) {
-        System.out.println("message = " + message);
-        String request = message.substring(6);
-        request = request.trim();
-        Pattern pattern = Pattern.compile("[[,\\s]\\s]");
-        Matcher matcher = pattern.matcher(request);
-        request = matcher.replaceAll(",");
-        return request;
-    }
-
     private void sendGptRequest(String message) {
         //TODO check if request exists
         String request = message.substring(5);
         String response = chatGptService.getChatGptResponse(request);
-        sender.sendMessage(response);
+        sender.sendMarkdownMessage("*ChatGPT*: " + "_" + response + "_");
     }
 
     @SneakyThrows
@@ -148,5 +118,25 @@ public class CommandParser implements Parser {
                 "-----------------------------------------------------\n" +
                 "       ORIGINAL                           TARGET";
         sender.sendInlineMessage(text, InlineKeyboardMarkup.builder().keyboard(buttons).build());
+    }
+
+    private void sendJokeWithRequest(String request) {
+        String joke = humorService.searchJoke(request);
+        sender.sendMessage(joke);
+    }
+
+    private void sendMemeWithRequest(String request) {
+        String memeUrl = humorService.searchMeme(request);
+        sender.sendPhoto(memeUrl);
+    }
+
+    private String parseHumorRequest(String message) {
+        System.out.println("message = " + message);
+        String request = message.substring(6);
+        request = request.trim();
+        Pattern pattern = Pattern.compile("[[,\\s]\\s]");
+        Matcher matcher = pattern.matcher(request);
+        request = matcher.replaceAll(",");
+        return request;
     }
 }

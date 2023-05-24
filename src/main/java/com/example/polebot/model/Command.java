@@ -12,9 +12,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public enum Command {
     INFO("/info", "give info about bot commands"),
-    CURRENCY("/currency", "change currency"),
-    JOKE("/joke", "get random joke"),
-    MEME("/meme", "get random meme");
+    CURRENCY("/currency", "change currency");
 
     private final String name;
     private final String desc;
