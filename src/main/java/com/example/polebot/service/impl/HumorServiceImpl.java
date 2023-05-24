@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class HumorServiceImpl implements HumorService {
@@ -58,7 +60,10 @@ public class HumorServiceImpl implements HumorService {
                 .addQueryParameter("keywords", parseRequestToKeywords(request))
                 .build();
         JSONObject json = getJsonResponse(httpUrl);
-        return null;
+        JSONArray jsonArray = json.getJSONArray("memes");
+        JSONObject jsonObject = jsonArray.getJSONObject(0);
+        String memeUrl = jsonObject.getString("url");
+        return memeUrl;
     }
 
     @Override
@@ -68,7 +73,8 @@ public class HumorServiceImpl implements HumorService {
                 .addQueryParameter("min-rating", MIN_RATING)
                 .build();
         JSONObject json = getJsonResponse(httpUrl);
-        return null;
+        String memeUrl = json.getString("url");
+        return memeUrl;
     }
 
     private JSONObject getJsonResponse(HttpUrl httpUrl) {
@@ -92,6 +98,10 @@ public class HumorServiceImpl implements HumorService {
     }
 
     private String parseRequestToKeywords(String request) {
+        request = request.trim();
+        Pattern pattern = Pattern.compile("[[,\\s]\\s]");
+        Matcher matcher = pattern.matcher(request);
+        request = matcher.replaceAll(",");
         return request;
     }
 }
