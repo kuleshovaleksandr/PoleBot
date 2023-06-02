@@ -30,7 +30,6 @@ public class MessageSender implements Sender {
     @Autowired private DBAnimationService dbAnimationService;
     @Autowired private GiphyAnimationService giphyAnimationService;
 
-    @Value("${bot.pole.owner}")
     private long chatId;
 
     @SneakyThrows

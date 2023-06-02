@@ -17,7 +17,4 @@ public class BotConfig {
 
     @Value("${bot.pole.token}")
     String token;
-
-    @Value("${bot.pole.owner}")
-    Long ownerId;
 }

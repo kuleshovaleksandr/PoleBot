@@ -30,7 +30,6 @@ public class CommandParser implements Parser {
     @Autowired private MessageSender sender;
     @Autowired private PoleBot bot;
     @Autowired private ChatGptService chatGptService;
-    @Autowired private HumorService humorService;
 
     @Getter
     private String imageRequest;
@@ -66,6 +65,8 @@ public class CommandParser implements Parser {
             //TODO check if request exists
             imageRequest = message.substring(7);
             showImageStyleMenu();
+        } else if(message.equals("/clean")) {
+            chatGptService.initChat();
         }
     }
 
@@ -120,23 +121,23 @@ public class CommandParser implements Parser {
         sender.sendInlineMessage(text, InlineKeyboardMarkup.builder().keyboard(buttons).build());
     }
 
-    private void sendJokeWithRequest(String request) {
-        String joke = humorService.searchJoke(request);
-        sender.sendMessage(joke);
-    }
-
-    private void sendMemeWithRequest(String request) {
-        String memeUrl = humorService.searchMeme(request);
-        sender.sendPhoto(memeUrl);
-    }
-
-    private String parseHumorRequest(String message) {
-        System.out.println("message = " + message);
-        String request = message.substring(6);
-        request = request.trim();
-        Pattern pattern = Pattern.compile("[[,\\s]\\s]");
-        Matcher matcher = pattern.matcher(request);
-        request = matcher.replaceAll(",");
-        return request;
-    }
+//    private void sendJokeWithRequest(String request) {
+//        String joke = humorService.searchJoke(request);
+//        sender.sendMessage(joke);
+//    }
+//
+//    private void sendMemeWithRequest(String request) {
+//        String memeUrl = humorService.searchMeme(request);
+//        sender.sendPhoto(memeUrl);
+//    }
+//
+//    private String parseHumorRequest(String message) {
+//        System.out.println("message = " + message);
+//        String request = message.substring(6);
+//        request = request.trim();
+//        Pattern pattern = Pattern.compile("[[,\\s]\\s]");
+//        Matcher matcher = pattern.matcher(request);
+//        request = matcher.replaceAll(",");
+//        return request;
+//    }
 }
