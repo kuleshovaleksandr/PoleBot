@@ -3,6 +3,7 @@ package com.example.polebot;
 import com.example.polebot.config.BotConfig;
 import com.example.polebot.handler.UpdateHandlerFactory;
 import com.example.polebot.handler.UpdateHandlerStage;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -29,6 +30,7 @@ public class PoleBot extends TelegramLongPollingBot {
         }
     }
 
+    @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
         if(update.hasMessage() && update.getMessage().hasText()) {

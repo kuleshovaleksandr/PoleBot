@@ -7,6 +7,7 @@ import com.example.polebot.service.CurrencyConversionService;
 import com.example.polebot.service.impl.ChatGptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -24,11 +25,12 @@ public class TextParser implements Parser {
     private final String KOREA_REQUEST = "расскажи интересный факт про Корею";
 
     @Override
-    public void parse(long chatId, String message) {
-        sender.setChatId(chatId);
-        getCurrencyValue(message);
-        findWordTesla(message);
-        findWordKorea(message);
+    public void parse(Message message) {
+        sender.setChatId(message.getChatId());
+        String text = message.getText();
+        getCurrencyValue(text);
+        findWordTesla(text);
+        findWordKorea(text);
     }
 
     private void findWordTesla(String message) {

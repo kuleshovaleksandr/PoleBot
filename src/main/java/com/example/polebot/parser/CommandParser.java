@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -52,18 +53,27 @@ public class CommandParser implements Parser {
         }
     }
 
+    @SneakyThrows
     @Override
-    public void parse(long chatId, String message) {
-        sender.setChatId(chatId);
-        if(message.equals(Command.INFO.getName())) {
+    public void parse(Message message) {
+        sender.setChatId(message.getChatId());
+        String text = message.getText();
+        String infoCommand = Command.INFO.getName();
+        String currencyCommand = Command.CURRENCY.getName();
+        if(message.getChat().getType().equals("group")) {
+            infoCommand += "@" + bot.getMe().getUserName();
+            currencyCommand += "@" + bot.getMe().getUserName();
+        }
+
+        if(text.equals(infoCommand)) {
             sender.sendMarkdownMessage(INFO_MESSAGE);
-        } else if(message.equals(Command.CURRENCY.getName())) {
+        } else if(text.equals(currencyCommand)) {
             showCurrencyMenu();
-        } else if(message.startsWith("/gpt")) {
-            sendGptRequest(message);
-        } else if(message.startsWith("/image")) {
+        } else if(text.startsWith("/gpt")) {
+            sendGptRequest(text);
+        } else if(text.startsWith("/image")) {
             //TODO check if request exists
-            imageRequest = message.substring(7);
+            imageRequest = text.substring(7);
             showImageStyleMenu();
         } else if(message.equals("/clean")) {
             chatGptService.initChat();

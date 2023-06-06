@@ -6,6 +6,7 @@ import com.example.polebot.parser.TextParser;
 import com.example.polebot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
@@ -17,15 +18,13 @@ public class TextUpdateHandler implements UpdateHandler {
 
     @Override
     public void handleUpdate(Update update) {
-        String message = update.getMessage().getText();
-        long chatId = update.getMessage().getChatId();
-
+        Message message = update.getMessage();
         userService.registerUser(update.getMessage());
 
-        if(message.startsWith("/")) {
-            commandParser.parse(chatId, message);
+        if(message.getText().startsWith("/")) {
+            commandParser.parse(message);
         } else {
-            textParser.parse(chatId, message);
+            textParser.parse(message);
         }
     }
 }
