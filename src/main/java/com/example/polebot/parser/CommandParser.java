@@ -5,7 +5,6 @@ import com.example.polebot.model.Command;
 import com.example.polebot.model.Currency;
 import com.example.polebot.model.NeuralLoveArtStyle;
 import com.example.polebot.sender.MessageSender;
-import com.example.polebot.service.HumorService;
 import com.example.polebot.service.impl.ChatGptService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -22,8 +21,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 public class CommandParser implements Parser {
@@ -60,7 +57,9 @@ public class CommandParser implements Parser {
         String text = message.getText();
         String infoCommand = Command.INFO.getName();
         String currencyCommand = Command.CURRENCY.getName();
-        if(message.getChat().getType().equals("group")) {
+        System.out.println(message.getChat().getType());
+        if(message.getChat().getType().equals("group") ||
+                message.getChat().getType().equals("supergroup")) {
             infoCommand += "@" + bot.getMe().getUserName();
             currencyCommand += "@" + bot.getMe().getUserName();
         }
@@ -75,7 +74,7 @@ public class CommandParser implements Parser {
             //TODO check if request exists
             imageRequest = text.substring(7);
             showImageStyleMenu();
-        } else if(message.equals("/clean")) {
+        } else if(text.equals("/clean")) {
             chatGptService.initChat();
         }
     }

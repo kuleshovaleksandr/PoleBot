@@ -21,8 +21,6 @@ public class NeuralLoveService {
     private String NEURAL_LOVE_GENERATE_URL;
     @Value("${neural.love.result-url}")
     private String NEURAL_LOVE_RESULT_URL;
-    @Value("${neural.love.price-url}")
-    private String NEURAL_LOVE_PRICE_URL;
 
     private boolean imageIsReady = false;
     private final Integer NUMBER_OF_IMAGES = 1;

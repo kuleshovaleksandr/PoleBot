@@ -14,10 +14,10 @@ public class AnimationUpdateHandler implements UpdateHandler {
 
     @Override
     public void handleUpdate(Update update) {
-        Animation animation = update.getMessage().getAnimation();
-        String id = animation.getFileUniqueId();
-        String fileId = animation.getFileId();
-        String name = animation.getFileName();
+//        Animation animation = update.getMessage().getAnimation();
+//        String id = animation.getFileUniqueId();
+//        String fileId = animation.getFileId();
+//        String name = animation.getFileName();
 //        animationService.saveAnimation(id, fileId, name);
     }
 }

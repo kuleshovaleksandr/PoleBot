@@ -1,7 +1,7 @@
 package com.example.polebot.service;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 public interface UserService {
-    void registerUser(Message message);
+    void registerUser(User user);
 }

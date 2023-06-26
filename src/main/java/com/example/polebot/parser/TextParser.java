@@ -29,8 +29,8 @@ public class TextParser implements Parser {
         sender.setChatId(message.getChatId());
         String text = message.getText();
         getCurrencyValue(text);
-        findWordTesla(text);
-        findWordKorea(text);
+//        findWordTesla(text);
+//        findWordKorea(text);
     }
 
     private void findWordTesla(String message) {

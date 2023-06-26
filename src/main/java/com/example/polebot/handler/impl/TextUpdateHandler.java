@@ -19,7 +19,7 @@ public class TextUpdateHandler implements UpdateHandler {
     @Override
     public void handleUpdate(Update update) {
         Message message = update.getMessage();
-        userService.registerUser(update.getMessage());
+        userService.registerUser(update.getMessage().getFrom());
 
         if(message.getText().startsWith("/")) {
             commandParser.parse(message);

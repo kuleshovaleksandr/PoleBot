@@ -13,8 +13,8 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +41,7 @@ public class CallBackUpdateHandler implements UpdateHandler {
     public void handleUpdate(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         String callbackData = callbackQuery.getData();
+        //TODO block button if user clicked it until request appears
         if(callbackData.contains(":")) {
             saveCurrencyChoice(callbackData);
         } else if(callbackData.equals("Transcribe")) {
@@ -69,9 +70,9 @@ public class CallBackUpdateHandler implements UpdateHandler {
     }
 
     private void sendVoiceTranscription() {
-        Chat chat = voiceUpdateHandler.getChat();
+        User user = voiceUpdateHandler.getUser();
         String transcription = chatGptService.getVoiceTranscription();
-        sender.sendMarkdownMessage("*" + chat.getUserName() + "*: " + transcription);
+        sender.sendMarkdownMessage("*" + user.getUserName() + "*: " + transcription);
     }
 
     private void sendRequestToChatGpt() {
