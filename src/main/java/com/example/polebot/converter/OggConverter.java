@@ -1,11 +1,11 @@
 package com.example.polebot.converter;
 
 import com.example.polebot.PoleBot;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.EncoderException;
 import ws.schild.jave.MultimediaObject;
@@ -45,13 +45,16 @@ public class OggConverter {
         }
     }
 
-    @SneakyThrows
     private void saveVoiceMessage(String fileId) {
         GetFile getFile = GetFile.builder()
                 .fileId(fileId)
                 .build();
-        String filePath = bot.execute(getFile).getFilePath();
-        File outputFile = new File(VOICE_OGG_PATH);
-        bot.downloadFile(filePath, outputFile);
+        try {
+            String filePath = bot.execute(getFile).getFilePath();
+            File outputFile = new File(VOICE_OGG_PATH);
+            bot.downloadFile(filePath, outputFile);
+        } catch(TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 }

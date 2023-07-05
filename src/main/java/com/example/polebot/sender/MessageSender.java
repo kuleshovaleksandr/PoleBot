@@ -7,14 +7,16 @@ import com.example.polebot.service.impl.DBAnimationService;
 import com.example.polebot.service.impl.GiphyAnimationService;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,17 +33,15 @@ public class MessageSender implements Sender {
 
     private long chatId;
 
-    @SneakyThrows
     @Override
     public void sendMessage(String text) {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
                 .text(text)
                 .build();
-        bot.execute(message);
+        executeMessage(message);
     }
 
-    @SneakyThrows
     @Override
     public void sendMarkdownMessage(String text) {
         SendMessage message = SendMessage.builder()
@@ -49,10 +49,9 @@ public class MessageSender implements Sender {
                 .text(text)
                 .parseMode("Markdown")
                 .build();
-        bot.execute(message);
+        executeMessage(message);
     }
 
-    @SneakyThrows
     @Override
     public void sendInlineMessage(String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
         SendMessage message = SendMessage.builder()
@@ -60,10 +59,21 @@ public class MessageSender implements Sender {
                 .text(text)
                 .replyMarkup(inlineKeyboardMarkup)
                 .build();
-        bot.execute(message);
+        executeMessage(message);
     }
 
-    @SneakyThrows
+    @Override
+    public void replyWithInlineMessageTo(int messageId, String text,
+                                         InlineKeyboardMarkup inlineKeyboardMarkup) {
+        SendMessage message = SendMessage.builder()
+                .chatId(chatId)
+                .text(text)
+                .replyToMessageId(messageId)
+                .replyMarkup(inlineKeyboardMarkup)
+                .build();
+        executeMessage(message);
+    }
+
     @Override
     public void sendInlineVoice(InputFile inputFile, InlineKeyboardMarkup inlineKeyboardMarkup) {
         SendVoice voice = SendVoice.builder()
@@ -71,52 +81,36 @@ public class MessageSender implements Sender {
                 .voice(inputFile)
                 .replyMarkup(inlineKeyboardMarkup)
                 .build();
-        bot.execute(voice);
+        executeMedia(voice);
     }
 
-    @SneakyThrows
-    @Override
-    public void replyWithInlineMessageTo(int messageId, String text, InlineKeyboardMarkup inlineKeyboardMarkup) {
-        SendMessage message = SendMessage.builder()
-                .chatId(chatId)
-                .text(text)
-                .replyToMessageId(messageId)
-                .replyMarkup(inlineKeyboardMarkup)
-                .build();
-        bot.execute(message);
-    }
-
-    @SneakyThrows
     @Override
     public void sendAnimation(InputFile inputFile) {
         SendAnimation sendAnimation = SendAnimation.builder()
                 .chatId(chatId)
                 .animation(inputFile)
                 .build();
-        bot.execute(sendAnimation);
+        executeMedia(sendAnimation);
     }
 
-    @SneakyThrows
     @Override
     public void sendSticker(InputFile inputFile) {
         SendSticker sendSticker = SendSticker.builder()
                 .chatId(chatId)
                 .sticker(new InputFile(stickerService.getStickerByEmoji("\uD83E\uDE9F").getFileId()))
                 .build();
-        bot.execute(sendSticker);
+        executeMedia(sendSticker);
     }
 
-    @SneakyThrows
     @Override
     public void sendPhoto(String imageUrl) {
         SendPhoto sendPhoto = SendPhoto.builder()
                 .chatId(chatId)
                 .photo(new InputFile(imageUrl))
                 .build();
-        bot.execute(sendPhoto);
+        executeMedia(sendPhoto);
     }
 
-    @SneakyThrows
     @Override
     public void editText(int messageId, String text) {
         EditMessageText message = EditMessageText.builder()
@@ -124,16 +118,34 @@ public class MessageSender implements Sender {
                 .text(text)
                 .messageId(messageId)
                 .build();
-        bot.execute(message);
+        try {
+            bot.execute(message);
+        } catch(TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
-    @SneakyThrows
     private void sendGif(String tag) {
         String gifUrl = giphyAnimationService.getRandomAnimation(tag);
         sendAnimation(new InputFile(gifUrl));
     }
 
-    @SneakyThrows
+    private void executeMedia(SendMediaBotMethod<Message> media) {
+        try {
+            bot.execute((SendDocument) media);
+        } catch(TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void executeMessage(BotApiMethod<Message> message) {
+        try {
+            bot.execute(message);
+        } catch(TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Scheduled(cron="${cron.scheduler.animation}")
     private void sendWeekDayAnimation() {
         Date date = new Date();

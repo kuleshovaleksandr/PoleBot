@@ -4,7 +4,6 @@ import com.example.polebot.entity.CurrencyRate;
 import com.example.polebot.model.Currency;
 import com.example.polebot.repository.CurrencyRateRepository;
 import com.example.polebot.service.CurrencyConversionService;
-import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -62,13 +61,17 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
         return response.peekBody(2048).string();
     }
 
-    @SneakyThrows
     @Scheduled(cron="${cron.scheduler.currency-rate}")
     private void saveCurrencyRates() {
         for(Currency currency: Currency.values()) {
             CurrencyRate currencyRate = new CurrencyRate();
             if(currency != Currency.BYN) {
-                JSONObject json = new JSONObject(getResponse(currency));
+                JSONObject json = null;
+                try {
+                    json = new JSONObject(getResponse(currency));
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
                 currencyRate.setId(currency.getId());
                 currencyRate.setCurrency(currency);
                 currencyRate.setScale(json.getDouble("Cur_Scale"));

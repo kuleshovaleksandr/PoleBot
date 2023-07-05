@@ -5,7 +5,6 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 import jakarta.annotation.PostConstruct;
-import lombok.SneakyThrows;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,6 @@ public class ChatGptService {
         messages.add(new ChatMessage(OpenAiRole.SYSTEM.getRole(), CHAT_ROLE));
     }
 
-    @SneakyThrows
     public String getGeneratedImageUrl(String prompt) {
         OkHttpClient client = new OkHttpClient();
 
@@ -81,14 +80,18 @@ public class ChatGptService {
                 .addHeader("Authorization", "Bearer " + API_KEY)
                 .addHeader("Content-Type", "application/json")
                 .build();
-        Response response = client.newCall(request).execute();
-        JSONObject json = new JSONObject(response.body().string());
+        JSONObject json = null;
+        try {
+            Response response = client.newCall(request).execute();
+            json = new JSONObject(response.body().string());
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
         JSONArray data = json.getJSONArray("data");
         JSONObject imageUrlJsonObject = data.getJSONObject(0);
         return imageUrlJsonObject.getString("url");
     }
 
-    @SneakyThrows
     public String getChatGptResponse(String prompt) {
         messages.forEach(System.out::println);
         OpenAiService service = new OpenAiService(API_KEY, Duration.ofSeconds(60));
@@ -109,7 +112,6 @@ public class ChatGptService {
         return response.toString();
     }
 
-    @SneakyThrows
     public String getVoiceTranscription() {
         OkHttpClient client = new OkHttpClient();
         MediaType mediaType = MediaType.parse("audio/mpeg");
@@ -125,8 +127,13 @@ public class ChatGptService {
                 .addHeader("Authorization", "Bearer " + API_KEY)
                 .addHeader("Content-Type", "multipart/form-data")
                 .build();
-        Response response = client.newCall(request).execute();
-        JSONObject json = new JSONObject(response.body().string());
+        JSONObject json = null;
+        try {
+            Response response = client.newCall(request).execute();
+            json = new JSONObject(response.body().string());
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
         String voiceText = json.getString("text");
         return voiceText;
     }

@@ -31,7 +31,6 @@ public class DBStickerService implements StickerService {
         sticker.setFileId(fileId);
         sticker.setName(name);
         sticker.setEmoji(emoji);
-
         stickerRepository.save(sticker);
     }
 }

@@ -1,7 +1,6 @@
 package com.example.polebot.service.impl;
 
 import com.example.polebot.entity.Animation;
-import com.example.polebot.entity.Sticker;
 import com.example.polebot.model.WeekDay;
 import com.example.polebot.repository.AnimationRepository;
 import com.example.polebot.service.AnimationService;
@@ -38,7 +37,6 @@ public class DBAnimationService implements AnimationService {
         animation.setId(id);
         animation.setFileId(fileId);
         animation.setName(name);
-
         animationRepository.save(animation);
     }
 }

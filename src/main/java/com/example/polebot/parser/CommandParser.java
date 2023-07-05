@@ -8,7 +8,6 @@ import com.example.polebot.sender.MessageSender;
 import com.example.polebot.service.impl.ChatGptService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -50,18 +49,20 @@ public class CommandParser implements Parser {
         }
     }
 
-    @SneakyThrows
     @Override
     public void parse(Message message) {
         sender.setChatId(message.getChatId());
         String text = message.getText();
         String infoCommand = Command.INFO.getName();
         String currencyCommand = Command.CURRENCY.getName();
-        System.out.println(message.getChat().getType());
         if(message.getChat().getType().equals("group") ||
                 message.getChat().getType().equals("supergroup")) {
-            infoCommand += "@" + bot.getMe().getUserName();
-            currencyCommand += "@" + bot.getMe().getUserName();
+            try {
+                infoCommand += "@" + bot.getMe().getUserName();
+                currencyCommand += "@" + bot.getMe().getUserName();
+            } catch(TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
 
         if(text.equals(infoCommand)) {
@@ -86,7 +87,6 @@ public class CommandParser implements Parser {
         sender.sendMarkdownMessage("*ChatGPT*: " + "_" + response + "_");
     }
 
-    @SneakyThrows
     private void showImageStyleMenu() {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
@@ -107,7 +107,6 @@ public class CommandParser implements Parser {
         sender.sendInlineMessage(text, InlineKeyboardMarkup.builder().keyboard(buttons).build());
     }
 
-    @SneakyThrows
     private void showCurrencyMenu() {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         for(Currency currency: Currency.values()) {
@@ -129,24 +128,4 @@ public class CommandParser implements Parser {
                 "       ORIGINAL                           TARGET";
         sender.sendInlineMessage(text, InlineKeyboardMarkup.builder().keyboard(buttons).build());
     }
-
-//    private void sendJokeWithRequest(String request) {
-//        String joke = humorService.searchJoke(request);
-//        sender.sendMessage(joke);
-//    }
-//
-//    private void sendMemeWithRequest(String request) {
-//        String memeUrl = humorService.searchMeme(request);
-//        sender.sendPhoto(memeUrl);
-//    }
-//
-//    private String parseHumorRequest(String message) {
-//        System.out.println("message = " + message);
-//        String request = message.substring(6);
-//        request = request.trim();
-//        Pattern pattern = Pattern.compile("[[,\\s]\\s]");
-//        Matcher matcher = pattern.matcher(request);
-//        request = matcher.replaceAll(",");
-//        return request;
-//    }
 }

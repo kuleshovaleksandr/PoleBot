@@ -14,11 +14,11 @@ public class StickerUpdateHandler implements UpdateHandler {
 
     @Override
     public void handleUpdate(Update update) {
-        Sticker sticker = update.getMessage().getSticker();
-        String id = sticker.getFileUniqueId();
-        String fileId = sticker.getFileId();
-        String name = sticker.getSetName();
-        String emoji = sticker.getEmoji();
+//        Sticker sticker = update.getMessage().getSticker();
+//        String id = sticker.getFileUniqueId();
+//        String fileId = sticker.getFileId();
+//        String name = sticker.getSetName();
+//        String emoji = sticker.getEmoji();
 //        stickerService.saveSticker(id, fileId, name, emoji);
     }
 }
