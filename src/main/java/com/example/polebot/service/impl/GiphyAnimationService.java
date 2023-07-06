@@ -2,6 +2,7 @@ package com.example.polebot.service.impl;
 
 import com.example.polebot.service.AnimationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GiphyAnimationService implements AnimationService {
@@ -46,6 +48,7 @@ public class GiphyAnimationService implements AnimationService {
             }
             in.close();
         } catch(IOException e) {
+            log.error("Error occurred: " + e.getMessage());
             e.printStackTrace();
         }
         return response.toString();

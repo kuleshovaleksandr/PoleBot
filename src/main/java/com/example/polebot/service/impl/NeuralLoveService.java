@@ -2,6 +2,7 @@ package com.example.polebot.service.impl;
 
 import com.example.polebot.exception.ConnectionTimeOutException;
 import com.example.polebot.model.NeuralLoveArtLayout;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class NeuralLoveService {
 
@@ -53,6 +55,7 @@ public class NeuralLoveService {
             JSONObject json = new JSONObject(response.body().string());
             orderId = json.getString("orderId");
         } catch(IOException e) {
+            log.error("Error occurred: " + e.getMessage());
             e.printStackTrace();
         }
         return getImageResult(orderId);

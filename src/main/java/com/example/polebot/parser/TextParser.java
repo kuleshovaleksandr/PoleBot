@@ -5,6 +5,7 @@ import com.example.polebot.model.Currency;
 import com.example.polebot.sender.MessageSender;
 import com.example.polebot.service.CurrencyConversionService;
 import com.example.polebot.service.impl.ChatGptService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Component
 public class TextParser implements Parser {
 
@@ -64,6 +66,7 @@ public class TextParser implements Parser {
                 String text = String.format("%4.2f %s is %4.2f %s", value, originalCurrency, (value * conversionRatio), targetCurrency);
                 sender.sendMessage(text);
             } catch (NumberFormatException e) {
+                log.error("Number format exception trying parse " + message + " to Double");
                 sender.sendMarkdownMessage("_Please enter a number_");
             }
         }

@@ -8,6 +8,7 @@ import com.example.polebot.sender.MessageSender;
 import com.example.polebot.service.impl.ChatGptService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Component
 public class CommandParser implements Parser {
 
@@ -45,6 +47,7 @@ public class CommandParser implements Parser {
         try {
             bot.execute(new SetMyCommands(Command.getBotCommands(), new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
+            log.error("Error occurred while setting bot commands");
             e.printStackTrace();
         }
     }
@@ -58,9 +61,11 @@ public class CommandParser implements Parser {
         if(message.getChat().getType().equals("group") ||
                 message.getChat().getType().equals("supergroup")) {
             try {
-                infoCommand += "@" + bot.getMe().getUserName();
-                currencyCommand += "@" + bot.getMe().getUserName();
+                String botName = bot.getMe().getUserName();
+                infoCommand += "@" + botName;
+                currencyCommand += "@" + botName;
             } catch(TelegramApiException e) {
+                log.error("Error occurred while getting bot name");
                 e.printStackTrace();
             }
         }

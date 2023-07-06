@@ -4,6 +4,7 @@ import com.example.polebot.entity.CurrencyRate;
 import com.example.polebot.model.Currency;
 import com.example.polebot.repository.CurrencyRateRepository;
 import com.example.polebot.service.CurrencyConversionService;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -13,9 +14,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.sql.Timestamp;
 
+@Slf4j
 @Service
 public class NbrbCurrencyConversionService implements CurrencyConversionService {
 
@@ -40,15 +41,14 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
             double scale = json.getDouble("Cur_Scale");
             double rate = json.getDouble("Cur_OfficialRate");
             return rate / scale;
-        } catch(ConnectException e) {
+        } catch(IOException e) {
             CurrencyRate currencyRate = currencyRateRepository.findById(currency.getId()).get();
             double scale = currencyRate.getScale();
             double rate = currencyRate.getRate();
+            log.error("Error occurred getting currency rate: " + e.getMessage() +
+            "\nCurrency rate loaded from database.");
             return rate / scale;
-        } catch(IOException e) {
-            e.printStackTrace();
         }
-        return 0;
     }
 
     private String getResponse(Currency currency) throws IOException{
@@ -70,6 +70,7 @@ public class NbrbCurrencyConversionService implements CurrencyConversionService 
                 try {
                     json = new JSONObject(getResponse(currency));
                 } catch(IOException e) {
+                    log.error("Error occurred: " + e.getMessage());
                     e.printStackTrace();
                 }
                 currencyRate.setId(currency.getId());

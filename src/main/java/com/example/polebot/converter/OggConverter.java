@@ -1,6 +1,7 @@
 package com.example.polebot.converter;
 
 import com.example.polebot.PoleBot;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import ws.schild.jave.encode.EncodingAttributes;
 
 import java.io.File;
 
+@Slf4j
 @Component
 public class OggConverter {
 
@@ -40,8 +42,10 @@ public class OggConverter {
             File sourceFile = new File(VOICE_OGG_PATH);
             File targetFile = new File(VOICE_MP3_PATH);
             encoder.encode(new MultimediaObject(sourceFile), targetFile, attrs);
-        } catch (IllegalArgumentException | EncoderException ex){
-
+            log.info("Voice message converted to MP3 with id: " + fileId);
+        } catch (IllegalArgumentException | EncoderException e) {
+            log.error("Error occurred: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -53,7 +57,9 @@ public class OggConverter {
             String filePath = bot.execute(getFile).getFilePath();
             File outputFile = new File(VOICE_OGG_PATH);
             bot.downloadFile(filePath, outputFile);
+            log.info("Voice message saved with id: " + fileId);
         } catch(TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
             e.printStackTrace();
         }
     }

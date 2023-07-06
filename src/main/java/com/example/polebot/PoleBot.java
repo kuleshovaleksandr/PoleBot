@@ -3,6 +3,7 @@ package com.example.polebot;
 import com.example.polebot.config.BotConfig;
 import com.example.polebot.handler.UpdateHandlerFactory;
 import com.example.polebot.handler.UpdateHandlerStage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -13,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+@Slf4j
 @Component
 public class PoleBot extends TelegramLongPollingBot {
 
@@ -25,12 +27,14 @@ public class PoleBot extends TelegramLongPollingBot {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(this);
         } catch(TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     @Override
     public void onUpdateReceived(Update update) {
+        log.info("Bot updated");
         if(update.hasMessage() && update.getMessage().hasText()) {
             updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.TEXT)
                     .handleUpdate(update);

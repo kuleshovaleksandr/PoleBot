@@ -10,6 +10,7 @@ import com.example.polebot.service.impl.ChatGptService;
 import com.example.polebot.service.impl.NeuralLoveService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -19,6 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @Component
 public class CallBackUpdateHandler implements UpdateHandler {
 
@@ -64,7 +66,9 @@ public class CallBackUpdateHandler implements UpdateHandler {
             for(String imageUrl: imageUrlList) {
                 sender.sendPhoto(imageUrl);
             }
+            log.info("Image generated with request " + request);
         } catch(ConnectionTimeOutException e) {
+            log.error("Connection time out error while generating image");
             sender.sendMarkdownMessage("_" + e.getMessage() + "_");
         }
     }

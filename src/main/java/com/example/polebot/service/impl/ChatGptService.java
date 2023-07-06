@@ -5,6 +5,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,6 +18,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ChatGptService {
 
@@ -65,8 +67,6 @@ public class ChatGptService {
     }
 
     public String getGeneratedImageUrl(String prompt) {
-        OkHttpClient client = new OkHttpClient();
-
         JSONObject jsonRequest = new JSONObject();
         jsonRequest.put("prompt", prompt);
         jsonRequest.put("n", NUMBER_OF_IMAGES);
@@ -80,13 +80,7 @@ public class ChatGptService {
                 .addHeader("Authorization", "Bearer " + API_KEY)
                 .addHeader("Content-Type", "application/json")
                 .build();
-        JSONObject json = null;
-        try {
-            Response response = client.newCall(request).execute();
-            json = new JSONObject(response.body().string());
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+        JSONObject json = getJson(request);
         JSONArray data = json.getJSONArray("data");
         JSONObject imageUrlJsonObject = data.getJSONObject(0);
         return imageUrlJsonObject.getString("url");
@@ -113,7 +107,6 @@ public class ChatGptService {
     }
 
     public String getVoiceTranscription() {
-        OkHttpClient client = new OkHttpClient();
         MediaType mediaType = MediaType.parse("audio/mpeg");
         File file = new File(AUDIO_FILE_PATH);
         RequestBody requestBody = new MultipartBody.Builder()
@@ -127,14 +120,22 @@ public class ChatGptService {
                 .addHeader("Authorization", "Bearer " + API_KEY)
                 .addHeader("Content-Type", "multipart/form-data")
                 .build();
+        JSONObject json = getJson(request);
+        String voiceText = json.getString("text");
+        return voiceText;
+    }
+
+    private JSONObject getJson(Request request) {
+        OkHttpClient client = new OkHttpClient();
         JSONObject json = null;
         try {
             Response response = client.newCall(request).execute();
             json = new JSONObject(response.body().string());
+            log.info("Json successfully received: " + json);
         } catch(IOException e) {
+            log.error("Error occurred: " + e.getMessage());
             e.printStackTrace();
         }
-        String voiceText = json.getString("text");
-        return voiceText;
+        return json;
     }
 }

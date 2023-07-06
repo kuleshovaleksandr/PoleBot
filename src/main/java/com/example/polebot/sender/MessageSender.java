@@ -7,6 +7,7 @@ import com.example.polebot.service.impl.DBAnimationService;
 import com.example.polebot.service.impl.GiphyAnimationService;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.Calendar;
 import java.util.Date;
 
+@Slf4j
 @Setter
 @Getter
 @Component
@@ -133,7 +135,9 @@ public class MessageSender implements Sender {
     private void executeMedia(SendMediaBotMethod<Message> media) {
         try {
             bot.execute((SendDocument) media);
+            log.info("Media executed");
         } catch(TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -141,7 +145,9 @@ public class MessageSender implements Sender {
     private void executeMessage(BotApiMethod<Message> message) {
         try {
             bot.execute(message);
+            log.info("Message executed");
         } catch(TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
             e.printStackTrace();
         }
     }
