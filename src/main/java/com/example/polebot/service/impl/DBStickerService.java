@@ -25,12 +25,13 @@ public class DBStickerService implements StickerService {
     }
 
     @Override
-    public void saveSticker(String id, String fileId, String name, String emoji) {
+    public Sticker saveSticker(String id, String fileId, String name, String emoji) {
         Sticker sticker = new Sticker();
         sticker.setId(id);
         sticker.setFileId(fileId);
         sticker.setName(name);
         sticker.setEmoji(emoji);
         stickerRepository.save(sticker);
+        return sticker;
     }
 }

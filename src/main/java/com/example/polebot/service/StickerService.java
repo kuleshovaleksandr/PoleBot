@@ -7,5 +7,5 @@ public interface StickerService {
 
     Sticker getStickerById(String id);
 
-    void saveSticker(String id, String fileId, String name, String emoji);
+    Sticker saveSticker(String id, String fileId, String name, String emoji);
 }
