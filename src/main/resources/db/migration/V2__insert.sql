@@ -235,3 +235,26 @@ INSERT INTO public.animations (id, file_id, name, week_day) VALUES ('AgADhwMAAr3
 INSERT INTO public.animations (id, file_id, name, week_day) VALUES ('AgADMAMAAv34JVM', 'CgACAgQAAxkBAAICJ2RU7Zvt6fYDFrYQYonmqe_x_eNtAAIwAwAC_fglU_wsjmM5jJnlLwQ', 'happy-sunday-good-morning.mp4', 'SUNDAY');
 INSERT INTO public.animations (id, file_id, name, week_day) VALUES ('AgADHwMAAgT4BVM', 'CgACAgQAAxkBAAICKGRU7a2UtgYKQ4ukJtDwbg4KMVV4AAIfAwACBPgFU24pdf2eXm5gLwQ', 'vasárnap-happy-sunday.mp4', 'SUNDAY');
 INSERT INTO public.animations (id, file_id, name, week_day) VALUES ('AgADOQMAAtt_JFM', 'CgACAgQAAxkBAAICKWRU7bGsFJL_tNpdxg6ST-br9LmXAAI5AwAC238kU1wTMdqxlsLdLwQ', 'happy-sunday-have-a-good-day.mp4', 'SUNDAY');
+
+
+INSERT INTO public.currency_rate (id, currency, date, rate, scale) VALUES (0, 'BYN', '2023-05-22 11:45:03.619000', 1, 1);
+INSERT INTO public.currency_rate (id, currency, date, rate, scale) VALUES (431, 'USD', '2023-05-22 11:56:00.169000', 2.9259, 1);
+INSERT INTO public.currency_rate (id, currency, date, rate, scale) VALUES (451, 'EUR', '2023-05-22 11:56:00.350000', 3.16, 1);
+INSERT INTO public.currency_rate (id, currency, date, rate, scale) VALUES (456, 'RUB', '2023-05-22 11:56:00.477000', 3.6667, 100);
+
+INSERT INTO public.stickers (id, emoji, file_id, name) VALUES ('AgADNh0AAngeYUk', '🪟', 'CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ', 'PoleShumit');
+INSERT INTO public.stickers (id, emoji, file_id, name) VALUES ('AgADCyEAArKYaEk', '💨', 'CAACAgIAAxkBAAIBI2RU1_GRmvCVGCBPIaQkUi0G8dGwAAILIQACsphoSeoqeW-o36G9LwQ', 'PoleShumit');
+INSERT INTO public.stickers (id, emoji, file_id, name) VALUES ('AgADoyAAAoyF0Es', '💤', 'CAACAgIAAxkBAAIBJGRU2EtiXPokJCgBbQH6Cig2wQZsAAKjIAACjIXQS_x-v7oX_y9CLwQ', 'PoleShumit');
+INSERT INTO public.stickers (id, emoji, file_id, name) VALUES ('AgADrRUAAhSfiEg', '🛏', 'CAACAgIAAxkBAAIBJWRU2LSqJ6zsbVITd6jBfheTShsxAAKtFQACFJ-ISJ2W6eP1eZfDLwQ', 'PoleShumit');
+
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (491578081, 'Александр', 'Кулешов', '2023-05-05 19:53:52.837000', 'drevenb');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (-973681480, null, null, '2023-06-06 18:52:57.217000', null);
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (17978263, 'Alexey', 'Diachenko', '2023-06-06 19:56:10.663000', 'alexeydiachenko');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (6289962678, 'Дима', null, '2023-06-07 12:10:09.321000', 'mitsura_tailor');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (452408304, 'Neon', null, '2023-06-07 13:04:19.832000', 'Neon2289');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (324248932, 'Lucy', 'Bond', '2023-06-07 13:09:58.715000', 'Lusionok');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (364320254, 'Elena', 'Kuleshova', '2023-06-07 13:57:19.999000', 'elenakuleshova');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (583691412, 'Anastasiya', 'Kuleshova', '2023-06-07 14:00:22.603000', 'nastiakul');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (498667722, 'Надзея', null, '2023-06-07 14:14:34.495000', 'nadzeia_s');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (431797821, 'Mike', 'Duong', '2023-06-07 15:13:16.765000', 'Mike_Duong');
+INSERT INTO public.users (id, first_name, last_name, registered_at, user_name) VALUES (254164731, 'ClubNika🍓', null, '2023-06-07 20:09:27.736000', 'ClubnikaVeronika');
