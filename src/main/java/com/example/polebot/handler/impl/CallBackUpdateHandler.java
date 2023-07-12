@@ -43,7 +43,6 @@ public class CallBackUpdateHandler implements UpdateHandler {
     public void handleUpdate(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         String callbackData = callbackQuery.getData();
-        //TODO block button if user clicked it until request appears
         if(callbackData.contains(":")) {
             saveCurrencyChoice(callbackData);
         } else if(callbackData.equals("Transcribe")) {

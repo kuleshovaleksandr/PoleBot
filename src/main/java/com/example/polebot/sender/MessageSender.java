@@ -83,7 +83,13 @@ public class MessageSender implements Sender {
                 .voice(inputFile)
                 .replyMarkup(inlineKeyboardMarkup)
                 .build();
-        executeMedia(voice);
+        try {
+            bot.execute(voice);
+            log.info("Media executed");
+        } catch(TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -92,7 +98,13 @@ public class MessageSender implements Sender {
                 .chatId(chatId)
                 .animation(inputFile)
                 .build();
-        executeMedia(sendAnimation);
+        try {
+            bot.execute(sendAnimation);
+            log.info("Media executed");
+        } catch(TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -101,7 +113,13 @@ public class MessageSender implements Sender {
                 .chatId(chatId)
                 .sticker(new InputFile(stickerService.getStickerByEmoji("\uD83E\uDE9F").getFileId()))
                 .build();
-        executeMedia(sendSticker);
+        try {
+            bot.execute(sendSticker);
+            log.info("Media executed");
+        } catch(TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -110,7 +128,13 @@ public class MessageSender implements Sender {
                 .chatId(chatId)
                 .photo(new InputFile(imageUrl))
                 .build();
-        executeMedia(sendPhoto);
+        try {
+            bot.execute(sendPhoto);
+            log.info("Media executed");
+        } catch(TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -130,16 +154,6 @@ public class MessageSender implements Sender {
     private void sendGif(String tag) {
         String gifUrl = giphyAnimationService.getRandomAnimation(tag);
         sendAnimation(new InputFile(gifUrl));
-    }
-
-    private void executeMedia(SendMediaBotMethod<Message> media) {
-        try {
-            bot.execute((SendDocument) media);
-            log.info("Media executed");
-        } catch(TelegramApiException e) {
-            log.error("Error occurred: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     private void executeMessage(BotApiMethod<Message> message) {

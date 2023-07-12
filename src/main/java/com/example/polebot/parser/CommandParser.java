@@ -1,6 +1,7 @@
 package com.example.polebot.parser;
 
 import com.example.polebot.PoleBot;
+import com.example.polebot.exception.RequestNotExistsException;
 import com.example.polebot.model.Command;
 import com.example.polebot.model.Currency;
 import com.example.polebot.model.NeuralLoveArtStyle;
@@ -32,6 +33,7 @@ public class CommandParser implements Parser {
 
     @Getter
     private String imageRequest;
+    private final String REQUEST_NOT_EXISTS_MESSAGE = "Please type your request after the bot command";
     private final String INFO_MESSAGE = "*/currency* - this command shows you a menu where " +
             "you can choose _original_ and _target_ currencies. " +
             "Next message has to contain a number you want to change. " +
@@ -69,30 +71,40 @@ public class CommandParser implements Parser {
                 e.printStackTrace();
             }
         }
-
-        if(text.equals(infoCommand)) {
-            sender.sendMarkdownMessage(INFO_MESSAGE);
-        } else if(text.equals(currencyCommand)) {
-            showCurrencyMenu();
-        } else if(text.startsWith("/gpt")) {
-            sendGptRequest(text);
-        } else if(text.startsWith("/image")) {
-            //TODO check if request exists
-            imageRequest = text.substring(7);
-            showImageStyleMenu();
-        } else if(text.equals("/clean")) {
-            chatGptService.initChat();
+        try {
+            if(text.equals(infoCommand)) {
+                sender.sendMarkdownMessage(INFO_MESSAGE);
+            } else if(text.equals(currencyCommand)) {
+                showCurrencyMenu();
+            } else if(text.startsWith("/gpt")) {
+                sendGptRequest(text);
+            } else if(text.startsWith("/image")) {
+                showImageStyleMenu(text);
+            } else if(text.equals("/clean")) {
+                chatGptService.initChat();
+            }
+        } catch(RequestNotExistsException e) {
+            sender.sendMarkdownMessage("_" + REQUEST_NOT_EXISTS_MESSAGE + "_");
+            log.error("Error occurred: " + e.getMessage());
+            e.printStackTrace();
         }
+
     }
 
-    private void sendGptRequest(String message) {
-        //TODO check if request exists
-        String request = message.substring(5);
+    private void sendGptRequest(String text) throws RequestNotExistsException {
+        if(text.trim().length() == "/gpt".length()) {
+            throw new RequestNotExistsException(REQUEST_NOT_EXISTS_MESSAGE);
+        }
+        String request = text.substring(5);
         String response = chatGptService.getChatGptResponse(request);
         sender.sendMarkdownMessage("*ChatGPT*: " + "_" + response + "_");
     }
 
-    private void showImageStyleMenu() {
+    private void showImageStyleMenu(String text) throws RequestNotExistsException {
+        if(text.trim().length() == "/image".length()) {
+            throw new RequestNotExistsException(REQUEST_NOT_EXISTS_MESSAGE);
+        }
+        imageRequest = text.substring(7);
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
         for(int i = 0; i < NeuralLoveArtStyle.values().length;) {
@@ -108,8 +120,8 @@ public class CommandParser implements Parser {
             }
             buttons.add(row);
         }
-        String text = "Please choose style for your image";
-        sender.sendInlineMessage(text, InlineKeyboardMarkup.builder().keyboard(buttons).build());
+        String styleImageText = "Please choose style for your image";
+        sender.sendInlineMessage(styleImageText, InlineKeyboardMarkup.builder().keyboard(buttons).build());
     }
 
     private void showCurrencyMenu() {
