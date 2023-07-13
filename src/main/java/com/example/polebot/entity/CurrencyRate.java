@@ -2,12 +2,16 @@ package com.example.polebot.entity;
 
 import com.example.polebot.model.Currency;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.sql.Timestamp;
 
 @Entity
 @Data
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Table(name="")
 public class CurrencyRate {
 

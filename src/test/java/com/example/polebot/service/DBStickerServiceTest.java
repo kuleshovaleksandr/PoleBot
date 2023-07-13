@@ -22,7 +22,6 @@ public class DBStickerServiceTest {
 
     @Mock
     private StickerRepository stickerRepository;
-
     private Sticker sticker;
 
     @BeforeEach
@@ -34,7 +33,7 @@ public class DBStickerServiceTest {
     }
 
     @Test
-    public void getStickerById() {
+    public void get_sticker_by_id() {
         Mockito.when(stickerRepository.findById("AgADNh0AAngeYUk")).thenReturn(Optional.of(sticker));
         Sticker sticker = stickerService.getStickerById("AgADNh0AAngeYUk");
         Assertions.assertEquals("CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ",
@@ -43,7 +42,7 @@ public class DBStickerServiceTest {
     }
 
     @Test
-    public void getStickerByEmoji() {
+    public void get_sticker_by_emoji() {
         Mockito.when(stickerRepository.findByEmoji("\uD83E\uDE9F")).thenReturn(Optional.of(sticker));
         Sticker sticker = stickerService.getStickerByEmoji("\uD83E\uDE9F");
         Assertions.assertEquals("CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ",
@@ -53,7 +52,7 @@ public class DBStickerServiceTest {
     }
 
     @Test
-    public void saveStickerToDB() {
+    public void save_sticker_to_db() {
         Mockito.when(stickerRepository.save(sticker)).thenReturn(sticker);
         Sticker sticker = stickerService.saveSticker("AgADNh0AAngeYUk",
                 "CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ",
