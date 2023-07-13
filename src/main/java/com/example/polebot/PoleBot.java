@@ -47,7 +47,7 @@ public class PoleBot extends TelegramLongPollingBot {
         } else if(update.hasMessage() && update.getMessage().hasSticker()) {
             updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.STICKER)
                     .handleUpdate(update);
-        } else if(update.getMessage().hasVoice()) {
+        } else if(update.hasMessage() && update.getMessage().hasVoice()) {
             updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.VOICE)
                     .handleUpdate(update);
         }

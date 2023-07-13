@@ -16,7 +16,10 @@ public enum NeuralLoveArtStyle {
     SPACE("space"),
     CREEPY("creepy"),
     TATTOO("tattoo"),
+    TEXTURE("texture"),
+    ANYTHING("anything"),
     PHOTO("photo"),
+    TAROT("tarot"),
     IMPASTO_OIL("impasto oil");
 
     private final String style;
