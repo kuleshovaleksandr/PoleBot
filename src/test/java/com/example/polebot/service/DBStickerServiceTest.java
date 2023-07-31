@@ -22,49 +22,47 @@ public class DBStickerServiceTest {
 
     @Mock
     private StickerRepository stickerRepository;
+
     private Sticker sticker;
+    private final String STICKER_FILE_ID = "CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ";
+    private final String STICKER_ID = "AgADNh0AAngeYUk";
+    private final String STICKER_EMOJI = "\uD83E\uDE9F";
+    private final String STICKER_NAME = "PoleShumit";
 
     @BeforeEach
     public void initSticker() {
-        sticker = new Sticker("AgADNh0AAngeYUk",
-                "CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ",
-                "PoleShumit",
-                "\uD83E\uDE9F");
+        sticker = new Sticker(STICKER_ID,
+                STICKER_FILE_ID,
+                STICKER_NAME,
+                STICKER_EMOJI);
     }
 
     @Test
     public void get_sticker_by_id() {
-        Mockito.when(stickerRepository.findById("AgADNh0AAngeYUk")).thenReturn(Optional.of(sticker));
-        Sticker sticker = stickerService.getStickerById("AgADNh0AAngeYUk");
-        Assertions.assertEquals("CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ",
-                sticker.getFileId());
-        Assertions.assertEquals("\uD83E\uDE9F", sticker.getEmoji());
+        Mockito.when(stickerRepository.findById(STICKER_ID)).thenReturn(Optional.of(sticker));
+        Sticker sticker = stickerService.getStickerById(STICKER_ID);
+        Assertions.assertEquals(STICKER_FILE_ID, sticker.getFileId());
+        Assertions.assertEquals(STICKER_EMOJI, sticker.getEmoji());
     }
 
     @Test
     public void get_sticker_by_emoji() {
-        Mockito.when(stickerRepository.findByEmoji("\uD83E\uDE9F")).thenReturn(Optional.of(sticker));
-        Sticker sticker = stickerService.getStickerByEmoji("\uD83E\uDE9F");
-        Assertions.assertEquals("CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ",
-                sticker.getFileId());
-        Assertions.assertEquals("AgADNh0AAngeYUk",
-                sticker.getId());
+        Mockito.when(stickerRepository.findByEmoji(STICKER_EMOJI)).thenReturn(Optional.of(sticker));
+        Sticker sticker = stickerService.getStickerByEmoji(STICKER_EMOJI);
+        Assertions.assertEquals(STICKER_FILE_ID, sticker.getFileId());
+        Assertions.assertEquals(STICKER_ID, sticker.getId());
     }
 
     @Test
     public void save_sticker_to_db() {
         Mockito.when(stickerRepository.save(sticker)).thenReturn(sticker);
-        Sticker sticker = stickerService.saveSticker("AgADNh0AAngeYUk",
-                "CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ",
-                "PoleShumit",
-                "\uD83E\uDE9F");
-        Assertions.assertEquals("AgADNh0AAngeYUk",
-                sticker.getId());
-        Assertions.assertEquals("CAACAgIAAxkBAAIBIGRU1UhDKSWqiBEiJR8KngiCc09RAAI2HQACeB5hSeLDi1LpC2yCLwQ",
-                sticker.getFileId());
-        Assertions.assertEquals("PoleShumit",
-                sticker.getName());
-        Assertions.assertEquals("\uD83E\uDE9F",
-                sticker.getEmoji());
+        Sticker sticker = stickerService.saveSticker(STICKER_ID,
+                STICKER_FILE_ID,
+                STICKER_NAME,
+                STICKER_EMOJI);
+        Assertions.assertEquals(STICKER_ID, sticker.getId());
+        Assertions.assertEquals(STICKER_FILE_ID, sticker.getFileId());
+        Assertions.assertEquals(STICKER_NAME, sticker.getName());
+        Assertions.assertEquals(STICKER_EMOJI, sticker.getEmoji());
     }
 }
