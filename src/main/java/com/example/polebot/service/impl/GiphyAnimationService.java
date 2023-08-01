@@ -1,5 +1,6 @@
 package com.example.polebot.service.impl;
 
+import com.example.polebot.entity.Animation;
 import com.example.polebot.service.AnimationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,7 @@ public class GiphyAnimationService implements AnimationService {
     }
 
     @Override
-    public void saveAnimation(String id, String fileId, String name) {
-
+    public Animation saveAnimation(String id, String fileId, String name) {
+        return null;
     }
 }

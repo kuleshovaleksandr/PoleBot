@@ -1,6 +1,7 @@
 package com.example.polebot.sender;
 
 import com.example.polebot.PoleBot;
+import com.example.polebot.entity.Animation;
 import com.example.polebot.model.WeekDay;
 import com.example.polebot.service.StickerService;
 import com.example.polebot.service.impl.DBAnimationService;
@@ -173,7 +174,7 @@ public class MessageSender implements Sender {
         calendar.setTime(date);
         int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
         WeekDay[] daysOfWeek = WeekDay.values();
-        String animationId = dbAnimationService.getRandomWeekDayAnimation(daysOfWeek[currentDay-1]);
-        sendAnimation(new InputFile(animationId));
+        Animation animation = dbAnimationService.getRandomWeekDayAnimation(daysOfWeek[currentDay-1]);
+        sendAnimation(new InputFile(animation.getFileId()));
     }
 }

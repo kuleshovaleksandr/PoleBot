@@ -1,10 +1,12 @@
 package com.example.polebot.service;
 
+import com.example.polebot.entity.Animation;
+
 public interface AnimationService {
 
     String getRandomAnimation(String tag);
 
     String getAnimation();
 
-    void saveAnimation(String id, String fileId, String name);
+    Animation saveAnimation(String id, String fileId, String name);
 }

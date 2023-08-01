@@ -16,9 +16,9 @@ public class DBAnimationService implements AnimationService {
     @Autowired
     private AnimationRepository animationRepository;
 
-    public String getRandomWeekDayAnimation(WeekDay weekDay) {
+    public Animation getRandomWeekDayAnimation(WeekDay weekDay) {
         List<Animation> animations = animationRepository.findAnimationsByWeekDay(weekDay);
-        return animations.get(new Random().nextInt(animations.size())).getFileId();
+        return animations.get(new Random().nextInt(animations.size()));
     }
 
     @Override
@@ -32,11 +32,11 @@ public class DBAnimationService implements AnimationService {
     }
 
     @Override
-    public void saveAnimation(String id, String fileId, String name) {
+    public Animation saveAnimation(String id, String fileId, String name) {
         Animation animation = new Animation();
         animation.setId(id);
         animation.setFileId(fileId);
         animation.setName(name);
-        animationRepository.save(animation);
+        return animationRepository.save(animation);
     }
 }

@@ -2,10 +2,14 @@ package com.example.polebot.entity;
 
 import com.example.polebot.model.WeekDay;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="animations")
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Animation {
 
