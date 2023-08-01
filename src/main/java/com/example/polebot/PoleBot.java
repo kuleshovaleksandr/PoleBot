@@ -34,7 +34,6 @@ public class PoleBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.info("Bot updated");
         if(update.hasMessage() && update.getMessage().hasText()) {
             updateHandlerFactory.getUpdateHandler(UpdateHandlerStage.TEXT)
                     .handleUpdate(update);

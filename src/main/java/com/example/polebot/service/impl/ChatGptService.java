@@ -87,11 +87,7 @@ public class ChatGptService {
     }
 
     public String getChatGptResponse(String prompt) {
-        messages.forEach(System.out::println);
         OpenAiService service = new OpenAiService(API_KEY, Duration.ofSeconds(60));
-        if(messages.size() % 5 == 0) {
-            messages.add(new ChatMessage(OpenAiRole.SYSTEM.getRole(), CHAT_ROLE));
-        }
         messages.add(new ChatMessage(OpenAiRole.USER.getRole(), prompt));
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model(GPT_MODEL)
@@ -121,8 +117,7 @@ public class ChatGptService {
                 .addHeader("Content-Type", "multipart/form-data")
                 .build();
         JSONObject json = getJson(request);
-        String voiceText = json.getString("text");
-        return voiceText;
+        return json.getString("text");
     }
 
     private JSONObject getJson(Request request) {
