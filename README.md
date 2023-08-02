@@ -7,7 +7,7 @@
 4) You can send a prompt to generate an image by AI NeuralLove with command **/image**.
 5) You can convert 4 currencies BYN, USD, EUR, RYB with command **/currency**.
 Currency rates are taken from National Bank of the Republic of Belarus.
-6) Every day at 8 a.m. bot sends you a greet animation.
+6) Every day at 8 a.m. bot sends you a greeting animation.
 
 #### Technology stack:
 1) Java 20
