@@ -17,3 +17,4 @@ Currency rates are taken from National Bank of the Republic of Belarus.
 5) FlyWay
 6) Lombok
 7) JUnit5
+8) Maven
